@@ -1,0 +1,79 @@
+{{- if $.Values.hooks }}
+{{- range $hooktype, $hookvalue := $.Values.hooks }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ $.Release.Name }}-{{ $hooktype }}-hook
+  labels:
+    app.kubernetes.io/name: {{ $.Release.Name }}
+    #helm.sh/chart: {{ $.Release.Chart }}
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+    app.kubernetes.io/managed-by: {{ $.Release.Service }}
+  annotations:
+    # This is what defines this resource as a hook. Without this line, the
+    # job is considered part of the release.
+    "helm.sh/hook-weight": "2"
+    "helm.sh/hook": {{ $hooktype }}
+    "helm.sh/hook-delete-policy": hook-succeeded,before-hook-creation
+spec:
+  ttlSecondsAfterFinished: 600
+  template:
+    spec:
+      containers:
+      - name: job-done
+        image: busybox
+        command: ['sh', '-c', 'echo "all jobs completed"']
+      initContainers:
+      {{- if $hookvalue }}
+      {{- range $hookname := $hookvalue }}
+      - name: {{ $hookname }}
+        image: "{{ $.Values.php.image.repository }}:{{ $.Values.php.image.tag }}"
+        imagePullPolicy: {{ $.Values.php.image.pullPolicy }}
+        workingDir: /app
+        command:
+        - /scripts/{{ $hookname }}.sh
+        env:
+        {{ if $.Values.offload.bucket }}
+        - name: WP_OFFLOAD_BUCKET
+          value: {{ $.Values.offload.bucket | quote }}
+        - name: WP_OFFLOAD_REGION
+          value: {{ $.Values.offload.region | quote }}
+        - name: WP_OFFLOAD_DOMAIN
+          value: {{ $.Values.offload.domain | quote }}
+        - name: WP_OFFLOAD_CLOUDFRONT
+          value: {{ $.Values.offload.cloudfront | quote }}
+        {{- end }}
+        - name: WP_DEFAULT_HOST
+          value: {{ index $.Values.ingress.hosts 0 "host" | quote }}
+        - name: WP_PLUGINS
+          value: {{ join " " $.Values.plugins | quote }}
+    {{- range $key, $value := $.Values.externalSecrets.mapping }}
+        - name: {{ $key | upper | replace "-" "_" }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "wordpress-bedrock.fullname" $ }}
+              key: {{ $key }}
+    {{- end }}
+{{- if $.Values.extraEnv }}
+{{ toYaml $.Values.extraEnv | indent 8 }}
+{{- end }}
+        volumeMounts:
+          - mountPath: /etc/php/7.2/fpm/php-fpm.conf
+            name: config-volume
+            subPath: fpm.conf
+          - mountPath: /etc/php/7.2/fpm/pool.d/www.conf
+            name: config-volume
+            subPath: fpm-pool.conf
+      {{- end }}
+      {{- end }}
+      restartPolicy: Never
+      volumes:
+      - name: config-volume
+        configMap:
+          # Provide the name of the ConfigMap containing the files you want
+          # to add to the container
+          name: {{ template "wordpress-bedrock.fullname" $ }}
+  backoffLimit: 4
+---
+{{- end }}
+{{- end }}

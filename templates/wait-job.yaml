@@ -1,0 +1,26 @@
+{{- if .Values.externalSecrets.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ $.Release.Name }}-pre-install-wait-hook
+  labels:
+    app.kubernetes.io/name: {{ $.Release.Name }}
+    #helm.sh/chart: {{ $.Release.Chart }}
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+    app.kubernetes.io/managed-by: {{ $.Release.Service }}
+  annotations:
+    # This is what defines this resource as a hook. Without this line, the
+    # job is considered part of the release.
+    "helm.sh/hook-weight": "1"
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-delete-policy": hook-succeeded,before-hook-creation
+spec:
+  ttlSecondsAfterFinished: 600
+  template:
+    spec:
+      containers:
+      - name: job-done
+        image: busybox
+        command: ['sh', '-c', 'sleep 60']
+      restartPolicy: Never
+{{- end }}

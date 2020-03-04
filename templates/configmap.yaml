@@ -1,0 +1,174 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "wordpress-bedrock.fullname" . }}
+  labels:
+{{ include "wordpress-bedrock.labels" . | indent 4 }}
+  annotations:
+    # This is what defines this resource as a hook. Without this line, the
+    # job is considered part of the release.
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation
+data:
+  www.conf: |-
+    [www]
+    listen = 9000
+    listen.owner = www-data
+    listen.group = www-data
+    pm = dynamic
+    pm.max_children = {{ .Values.php.fpm.pm.max_children }}
+    pm.start_servers = {{ .Values.php.fpm.pm.start_servers }}
+    pm.min_spare_servers = {{ .Values.php.fpm.pm.min_spare_servers }}
+    pm.max_spare_servers = {{ .Values.php.fpm.pm.max_spare_servers }}
+    pm.status_path = /fpm-status
+    ping.path = /fpm-ping
+    catch_workers_output = yes
+    clear_env = no
+    {{- range $key, $value := .Values.php.php_admin_value }}
+    php_admin_value[{{ $key }}] = {{ $value }}
+    {{- end }}
+  php-fpm.conf: |-
+    [global]
+    error_log = /dev/stderr
+    daemonize = no
+    include=etc/php-fpm.d/*.conf
+  nginx-default.conf: |-
+    upstream php-backend {
+        server php-fpm:9000 max_conns=10;
+    }
+
+    server {
+        listen       8080;
+        server_name  localhost;
+        root /var/www/html/web;
+        index index.php;
+
+        server_name_in_redirect off;
+        port_in_redirect off;
+
+        client_max_body_size {{ .Values.nginx.client_max_body_size }};
+
+        {{ $length := len $.Values.nginx.cors_origins }} {{ if gt $length 0 }}
+        # CORS headers
+        add_header Access-Control-Allow-Origin $cors_origin_header always;
+        add_header Access-Control-Allow-Credentials $cors_cred;
+        add_header "Access-Control-Allow-Methods" "GET, POST, OPTIONS, HEAD";
+        add_header "Access-Control-Allow-Headers" "Authorization, Origin, X-Requested-With, Content-Type, Accept";
+
+        if ($request_method = 'OPTIONS' ) {
+          return 204 no-content;
+        }
+        {{ end }}
+
+        # default files forbidden due to version info
+        location ^~ /readme.html {
+          return 403;
+        }
+        location ^~ /license.html {
+          return 403;
+        }
+
+        {{ if .Values.nginx.disallow_robots }}
+        # deny robot access
+        location = /robots.txt {
+          return 200 "User-agent: *\nDisallow: /";
+        }
+        {{ end }}
+
+        # private files
+        location ^~ /wp-config {
+          return 403;
+        }
+        location ^~ /wp/wp-config {
+          return 403;
+        }
+        location ^~ /wp/wp-settings {
+          return 403;
+        }
+        location ^~ /wp/wp-cron {
+          return 403;
+        }
+        location ^~ /wp/wp-load {
+          return 403;
+        }
+        location ^~ /wp/xmlrpc {
+          return 403;
+        }
+
+        {{ if .Values.offload.cloudfront }}
+        # offload uploads to s3
+        location ^~ /wp/wp-content/uploads/ {
+          rewrite "^/wp/wp-content/uploads/(.*)$" "https://{{ .Values.offload.cloudfront }}/wp-content/uploads/$1" break;
+        }
+        {{ end }}
+
+        {{ if .Values.nginx.additional_config }}
+        {{ .Values.nginx.additional_config | nindent 8 }}
+        {{ end }}
+
+        access_log /dev/stdout main;
+        error_log /dev/stderr;
+
+        #error_page  404              /404.html;
+
+        # redirect server error pages to the static page /50x.html
+        #
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   /usr/share/nginx/html;
+        }
+
+        location / {
+            index  index.php index.html index.htm;
+            try_files $uri $uri/ /index.php?path=$uri&$args;
+        }
+
+        # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+        #
+        location ~ \.php$ {
+            fastcgi_pass   php-backend;
+            fastcgi_index  index.php;
+            fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+            include        fastcgi_params;
+        }
+
+        location ~* ^.+\.(ogg|ogv|svg|svgz|eot|otf|woff|mp4|ttf|rss|atom|jpg|jpeg|gif|png|ico|zip|tgz|gz|rar|bz2|doc|xls|exe|ppt|tar|mid|midi|wav|bmp|rtf)$ {
+          #access_log off;
+          log_not_found off;
+          expires max;
+        }
+
+        # deny access to .htaccess files, if Apache's document root
+        # concurs with nginx's one
+        #
+        # Deny all attempts to access hidden files such as .htaccess, .htpasswd, .DS_Store (Mac).
+        # Keep logging the requests to parse later (or to pass to firewall utilities such as fail2ban)
+        location ~ /\. {
+          deny all;
+        }
+
+        # Deny access to any files with a .php extension in the uploads directory
+        # Works in sub-directory installs and also in multisite network
+        # Keep logging the requests to parse later (or to pass to firewall utilities such as fail2ban)
+        location ~* /(?:uploads|files)/.*\.php$ {
+          deny all;
+        }
+
+        # fpm monitor
+        location ~ /fpm-(status|ping) {
+          include fastcgi_params;
+          fastcgi_pass php-backend;
+          access_log off;
+          allow 127.0.0.1;
+          deny all;
+        }
+
+        # nginx monitor
+        location ~ /nginx-status {
+          stub_status on;
+          access_log off;
+          allow 127.0.0.1;
+          deny all;
+        }
+    }

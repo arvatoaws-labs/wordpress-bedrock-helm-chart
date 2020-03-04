@@ -1,0 +1,184 @@
+# Default values for wordpress-bedrock.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths: []
+
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+nginx:
+  image:
+    repository: nginx
+    tag: stable
+    pullPolicy: Always
+  resources: {}
+  disallow_robots: false
+  client_max_body_size: 10M
+  cors_origins: []
+  # this document will be attached to the nginx server block
+  additional_config:
+
+php:
+  image:
+    repository: php
+    tag: fpm
+    pullPolicy: Always
+  resources: {}
+  fpm:
+    pm:
+      max_children: 10
+      start_servers: 2
+      min_spare_servers: 1
+      max_spare_servers: 3
+      process_idle_timeout: 10s
+      max_requests: 500
+  php_admin_value:
+    memory_limit: 64M
+    upload_max_filesize: 10M
+    post_max_size: 15M
+    date.timezone: Europe/Berlin
+    display_errors: 'Off'
+
+## Additional environment variables to set
+extraEnv: []
+# extraEnv:
+#   - name: FOO
+#     valueFrom:
+#       secretKeyRef:
+#         key: FOO
+#         name: secret-resource
+
+# settings are used for WP Offload Media plugin
+offload:
+  bucket: null
+  region: null
+  domain: null
+  cloudfront: null
+  local_domains: null
+
+# these plugins will be activated using the activate-wp-plugins hook
+plugins:
+  - amazon-s3-and-cloudfront
+  - amazon-s3-and-cloudfront-tweaks
+
+wordpress:
+  # sample setting for office hours would be "Mon-Fri 07:30-18:30 Europe/Berlin"
+  uptime:
+  # sample setting for office hours would be "*/5 8-18 * * 1-5"
+  cron_schedule: "*/5 * * * *"
+
+# this sections allows to configure different hooks at different stages of the helm deployment
+hooks:
+  pre-install:
+    - wait-for-mysql-root
+    - create-mysql-database
+    - create-mysql-user
+    - wait-for-mysql-user
+    - verify-wp-core-checksums
+    #- install-wp-core
+    #- update-wp-core-database
+    #- activate-wp-plugins
+  post-install:
+  pre-upgrade:
+    - wait-for-mysql-user
+    - verify-wp-core-checksums
+    - update-wp-admin-user
+  post-upgrade:
+    - wait-for-mysql-user
+    - update-wp-core-database
+    - activate-wp-plugins
+    - migrate-amazon-s3
+
+# this section allows to inject external secrets into the wordpress deployment
+externalSecrets:
+  enabled: false
+  backendType: systemManager
+  mapping:
+#    db-root-username: /dev/wordpress-1/DB/username
+#    db-root-password: /dev/wordpress-1/DB/password
+#    db-username: /dev/exampleblog/DB/username
+#    db-password: /dev/exampleblog/DB/password
+#    wordpress-username: /dev/exampleblog/wordpress/username
+#    wordpress-password: /dev/exampleblog/wordpress/password
+
+monitoring:
+  enabled: true
+  serviceMonitor:
+    # When set true and if Prometheus Operator is installed then use a ServiceMonitor to configure scraping
+    enabled: true
+    # Set the namespace the ServiceMonitor should be deployed
+    # namespace: monitoring
+    # Set how frequently Prometheus should scrape
+    # interval: 30s
+
+exporter:
+  nginx:
+    image:
+      repository: nginx/nginx-prometheus-exporter
+      tag: 0.6.0
+      pullPolicy: Always
+    port: 9113
+    telemetry_path: /metrics
+    nginx_plus: false
+    scrape_uri: "http://127.0.0.1:8080/nginx-status"
+    ssl_verify: false
+    timeout: "60"
+    nginx_retries: "0"
+    nginx_retry_interval: "3"
+    resources: {}
+
+  phpfpm:
+    image:
+      repository: hipages/php-fpm_exporter
+      tag: 1.0.0
+      pullPolicy: Always
+    port: 9253
+    metrics: /metrics
+    scrape_uri: "tcp://127.0.0.1:9000/fpm-status"
+    fix_process_count: false
+    log_level: warn
+    resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
