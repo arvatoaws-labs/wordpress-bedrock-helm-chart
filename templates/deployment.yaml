@@ -74,6 +74,9 @@ spec:
             - name: fpm
               containerPort: 9000
               protocol: TCP
+          volumeMounts:
+          - name: web-volume
+            mountPath: /var/www/html
           env:
           {{ if $.Values.offload.bucket }}
             - name: WP_OFFLOAD_BUCKET

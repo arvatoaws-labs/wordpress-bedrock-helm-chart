@@ -160,7 +160,7 @@ exporter:
     nginx_plus: false
     scrape_uri: "http://127.0.0.1:8080/nginx-status"
     ssl_verify: false
-    timeout: "60"
+    timeout: "10s"
     nginx_retries: "0"
     nginx_retry_interval: "3"
     resources: {}
