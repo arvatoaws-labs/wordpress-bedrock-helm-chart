@@ -160,9 +160,9 @@ exporter:
     nginx_plus: false
     scrape_uri: "http://127.0.0.1:8080/nginx-status"
     ssl_verify: false
-    timeout: "10s"
+    timeout: "5s"
     nginx_retries: "0"
-    nginx_retry_interval: "3"
+    nginx_retry_interval: "5s"
     resources: {}
 
   phpfpm:
