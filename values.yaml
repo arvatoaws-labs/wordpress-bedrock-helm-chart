@@ -113,9 +113,9 @@ hooks:
     - create-mysql-user
     - wait-for-mysql-user
     - verify-wp-core-checksums
-    #- install-wp-core
-    #- update-wp-core-database
-    #- activate-wp-plugins
+    - install-wp-core
+    - update-wp-core-database
+    - activate-wp-plugins
   post-install:
   pre-upgrade:
     - wait-for-mysql-user

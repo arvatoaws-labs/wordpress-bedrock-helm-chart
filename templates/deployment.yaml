@@ -75,6 +75,12 @@ spec:
               containerPort: 9000
               protocol: TCP
           volumeMounts:
+          - mountPath: /usr/local/etc/php-fpm.conf
+            name: config-volume
+            subPath: php-fpm.conf
+          - mountPath: /usr/local/etc/php-fpm.d/www.conf
+            name: config-volume
+            subPath: www.conf
           - name: web-volume
             mountPath: /var/www/html
           env:
