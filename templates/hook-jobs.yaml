@@ -61,9 +61,7 @@ spec:
           - mountPath: /etc/php/7.2/fpm/php-fpm.conf
             name: config-volume
             subPath: fpm.conf
-          - mountPath: /etc/php/7.2/fpm/pool.d/www.conf
-            name: config-volume
-            subPath: fpm-pool.conf
+            readOnly: true
       {{- end }}
       {{- end }}
       restartPolicy: Never

@@ -75,7 +75,9 @@ php:
     upload_max_filesize: 10M
     post_max_size: 15M
     date.timezone: Europe/Berlin
+    error_reporting: E_ALL
     display_errors: 'Off'
+    log_errors: 'On'
 
 ## Additional environment variables to set
 extraEnv: []

@@ -1,0 +1,75 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ include "wordpress-bedrock.fullname" . }}
+  labels:
+{{ include "wordpress-bedrock.labels" . | indent 4 }}
+  annotations:
+    {{- if .Values.wordpress.uptime }}
+    downscaler/uptime: {{.Values.wordpress.uptime}}
+    {{- end }}
+spec:
+  schedule: "{{ .Values.wordpress.cron_schedule }}"
+  concurrencyPolicy: Replace
+  startingDeadlineSeconds: 1800
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          initContainers:
+          - name: copy-files
+            image: "{{ .Values.php.image.repository }}:{{ .Values.php.image.tag }}"
+            imagePullPolicy: {{ .Values.php.image.pullPolicy }}
+            command: ['sh', '-c', 'cp -r /app/* /var/www/html']
+            volumeMounts:
+            - name: web-volume
+              mountPath: /var/www/html
+          containers:
+          - name: wordpress-cron
+            image: "{{ .Values.php.image.repository }}:{{ .Values.php.image.tag }}"
+            imagePullPolicy: {{ .Values.php.image.pullPolicy }}
+            workingDir: /app
+            command:
+            - /scripts/run-cron.sh
+            env:
+            {{ if $.Values.offload.bucket }}
+              - name: WP_OFFLOAD_BUCKET
+                value: {{ $.Values.offload.bucket | quote }}
+              - name: WP_OFFLOAD_REGION
+                value: {{ $.Values.offload.region | quote }}
+              - name: WP_OFFLOAD_DOMAIN
+                value: {{ $.Values.offload.domain | quote }}
+              - name: WP_OFFLOAD_CLOUDFRONT
+                value: {{ $.Values.offload.cloudfront | quote }}
+            {{- end }}
+              - name: WP_DEFAULT_HOST
+                value: {{ index $.Values.ingress.hosts 0 "host" | quote }}
+              - name: WP_PLUGINS
+                value: {{ join " " $.Values.plugins | quote }}
+          {{- range $key, $value := .Values.externalSecrets.mapping }}
+              {{ if not (contains "wordpress-" $key) }}
+              {{ if not (contains "-root-" $key) }}
+              - name: {{ $key | upper | replace "-" "_" }}
+                valueFrom:
+                  secretKeyRef:
+                    name: {{ template "wordpress-bedrock.fullname" $ }}
+                    key: {{ $key }}
+              {{- end }}
+              {{- end }}
+          {{- end }}
+            volumeMounts:
+            - mountPath: /usr/local/etc/php-fpm.conf
+              name: config-volume
+              subPath: php-fpm.conf
+              readOnly: true
+            - name: web-volume
+              mountPath: /var/www/html
+          restartPolicy: OnFailure
+          volumes:
+          - name: config-volume
+            configMap:
+              # Provide the name of the ConfigMap containing the files you want
+              # to add to the container
+              name: {{ include "wordpress-bedrock.fullname" . }}
+          - name: web-volume
+            emptyDir: {}

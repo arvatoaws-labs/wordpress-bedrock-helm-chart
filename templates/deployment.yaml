@@ -78,9 +78,7 @@ spec:
           - mountPath: /usr/local/etc/php-fpm.conf
             name: config-volume
             subPath: php-fpm.conf
-          - mountPath: /usr/local/etc/php-fpm.d/www.conf
-            name: config-volume
-            subPath: www.conf
+            readOnly: true
           - name: web-volume
             mountPath: /var/www/html
           env:

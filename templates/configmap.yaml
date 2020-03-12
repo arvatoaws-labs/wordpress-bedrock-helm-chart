@@ -11,28 +11,67 @@ metadata:
     "helm.sh/hook": pre-install,pre-upgrade
     "helm.sh/hook-delete-policy": before-hook-creation
 data:
-  www.conf: |-
+  php-fpm.conf: |-
+    [global]
+
+    error_log = /proc/self/fd/2
+    daemonize = no
+
     [www]
-    listen = 9000
-    listen.owner = www-data
-    listen.group = www-data
+
+    ; if we send this to /proc/self/fd/1, it never appears
+    access.log = /proc/self/fd/2
+
+    user = www-data
+    group = www-data
+
+    listen = [::]:9000
+
     pm = dynamic
     pm.max_children = {{ .Values.php.fpm.pm.max_children }}
     pm.start_servers = {{ .Values.php.fpm.pm.start_servers }}
     pm.min_spare_servers = {{ .Values.php.fpm.pm.min_spare_servers }}
     pm.max_spare_servers = {{ .Values.php.fpm.pm.max_spare_servers }}
+
+    clear_env = no
+
+    ; Ensure worker stdout and stderr are sent to the main error log.
+    catch_workers_output = yes
+    ; This file was initially adapated from the output of: (on PHP 5.6)
+    ;   grep -vE '^;|^ *$' /usr/local/etc/php-fpm.conf.default
+
+    [global]
+
+    error_log = /proc/self/fd/2
+    daemonize = no
+
+    [www]
+
+    ; if we send this to /proc/self/fd/1, it never appears
+    access.log = /proc/self/fd/2
+
+    user = www-data
+    group = www-data
+
+    listen = [::]:9000
+
+    pm = dynamic
+    pm.max_children = 5
+    pm.start_servers = 2
+    pm.min_spare_servers = 1
+    pm.max_spare_servers = 3
+
     pm.status_path = /fpm-status
     ping.path = /fpm-ping
-    catch_workers_output = yes
+
     clear_env = no
+
+    ; Ensure worker stdout and stderr are sent to the main error log.
+    catch_workers_output = yes
+
     {{- range $key, $value := .Values.php.php_admin_value }}
     php_admin_value[{{ $key }}] = {{ $value }}
     {{- end }}
-  php-fpm.conf: |-
-    [global]
-    error_log = /dev/stderr
-    daemonize = no
-    include=etc/php-fpm.d/*.conf
   nginx-default.conf: |-
     upstream php-backend {
         server 127.0.0.1:9000 max_conns={{ .Values.php.fpm.pm.max_children }};
@@ -176,8 +215,9 @@ data:
 
         # fpm monitor
         location ~ /fpm-(status|ping) {
-          include fastcgi_params;
           fastcgi_pass php-backend;
+          fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+          include fastcgi_params;
           access_log off;
           allow 127.0.0.1;
           deny all;
