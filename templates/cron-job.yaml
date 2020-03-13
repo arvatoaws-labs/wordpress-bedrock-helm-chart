@@ -16,14 +16,7 @@ spec:
     spec:
       template:
         spec:
-          initContainers:
-          - name: copy-files
-            image: "{{ .Values.php.image.repository }}:{{ .Values.php.image.tag }}"
-            imagePullPolicy: {{ .Values.php.image.pullPolicy }}
-            command: ['sh', '-c', 'cp -r /app/* /var/www/html']
-            volumeMounts:
-            - name: web-volume
-              mountPath: /var/www/html
+          priorityClassName: background
           containers:
           - name: wordpress-cron
             image: "{{ .Values.php.image.repository }}:{{ .Values.php.image.tag }}"
@@ -57,6 +50,9 @@ spec:
               {{- end }}
               {{- end }}
           {{- end }}
+      {{- if .Values.extraEnv }}
+{{ toYaml .Values.extraEnv | indent 14 }}
+      {{- end }}
             volumeMounts:
             - mountPath: /usr/local/etc/php-fpm.conf
               name: config-volume
