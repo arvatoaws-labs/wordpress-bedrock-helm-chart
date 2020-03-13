@@ -1,7 +1,7 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: {{ include "wordpress-bedrock.fullname" . }}
+  name: {{ include "wordpress-bedrock.fullname" . }}-cron
   labels:
 {{ include "wordpress-bedrock.labels" . | indent 4 }}
   annotations:
