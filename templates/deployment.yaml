@@ -70,7 +70,7 @@ spec:
             readOnly: true
           - name: nginx-cache-volume
             mountPath: /var/cache/nginx
-            readOnly: true
+            readOnly: false
           resources:
             {{- toYaml .Values.nginx.resources | nindent 12 }}
         - name: {{ .Chart.Name }}-php-fpm
