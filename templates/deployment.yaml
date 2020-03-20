@@ -33,16 +33,19 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
         - name: copy-files
+          securityContext:
+            {{- toYaml .Values.php.securityContext | nindent 12 }}
           image: "{{ .Values.php.image.repository }}:{{ .Values.php.image.tag }}"
           imagePullPolicy: {{ .Values.php.image.pullPolicy }}
           command: ['sh', '-c', 'cp -r /app/* /var/www/html']
           volumeMounts:
           - name: web-volume
             mountPath: /var/www/html
+            readOnly: false
       containers:
         - name: {{ .Chart.Name }}-nginx
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+            {{- toYaml .Values.nginx.securityContext | nindent 12 }}
           image: "{{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}"
           imagePullPolicy: {{ .Values.nginx.image.pullPolicy }}
           ports:
@@ -61,13 +64,18 @@ spec:
           - mountPath: /etc/nginx/conf.d/default.conf
             name: config-volume
             subPath: nginx-default.conf
+            readOnly: true
           - name: web-volume
             mountPath: /var/www/html
+            readOnly: true
+          - name: nginx-cache-volume
+            mountPath: /var/cache/nginx
+            readOnly: true
           resources:
             {{- toYaml .Values.nginx.resources | nindent 12 }}
         - name: {{ .Chart.Name }}-php-fpm
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+            {{- toYaml .Values.php.securityContext | nindent 12 }}
           image: "{{ .Values.php.image.repository }}:{{ .Values.php.image.tag }}"
           imagePullPolicy: {{ .Values.php.image.pullPolicy }}
           ports:
@@ -81,6 +89,9 @@ spec:
             readOnly: true
           - name: web-volume
             mountPath: /var/www/html
+            readOnly: true
+          - name: tmp-volume
+            mountPath: /tmp
           env:
           {{ if $.Values.offload.bucket }}
             - name: WP_OFFLOAD_BUCKET
@@ -114,6 +125,8 @@ spec:
             {{- toYaml .Values.php.resources | nindent 12 }}
 {{- if ( .Values.monitoring.enabled ) }}
         - name: {{ .Chart.Name }}-php-fpm-monitor
+          securityContext:
+            {{- toYaml .Values.exporter.phpfpm.securityContext | nindent 12 }}
           image: "{{ .Values.exporter.phpfpm.image.repository }}:{{ .Values.exporter.phpfpm.image.tag }}"
           imagePullPolicy: {{ .Values.exporter.phpfpm.image.pullPolicy }}
           env:
@@ -138,6 +151,8 @@ spec:
           resources:
 {{ toYaml .Values.exporter.phpfpm.resources | indent 12 }}
         - name: {{ .Chart.Name }}-nginx-monitor
+          securityContext:
+            {{- toYaml .Values.exporter.nginx.securityContext | nindent 12 }}
           image: "{{ .Values.exporter.nginx.image.repository }}:{{ .Values.exporter.nginx.image.tag }}"
           imagePullPolicy: {{ .Values.exporter.nginx.image.pullPolicy }}
           env:
@@ -174,6 +189,10 @@ spec:
           # Provide the name of the ConfigMap containing the files you want
           # to add to the container
           name: {{ include "wordpress-bedrock.fullname" . }}
+      - name: tmp-volume
+        emptyDir: {}
+      - name: nginx-cache-volume
+        emptyDir: {}
       - name: web-volume
         emptyDir: {}
       {{- with .Values.nodeSelector }}

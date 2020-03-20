@@ -15,8 +15,8 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name:
 
-podSecurityContext: {}
-  # fsGroup: 2000
+podSecurityContext:
+  fsGroup: 2000
 
 securityContext: {}
   # capabilities:
@@ -55,6 +55,13 @@ nginx:
   cors_origins: []
   # this document will be attached to the nginx server block
   additional_config:
+  securityContext:
+    capabilities:
+      drop:
+      - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 101
 
 php:
   image:
@@ -78,6 +85,13 @@ php:
     error_reporting: E_ALL
     display_errors: 'Off'
     log_errors: 'On'
+  securityContext:
+    capabilities:
+      drop:
+      - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 82
 
 ## Additional environment variables to set
 extraEnv: []
@@ -166,6 +180,13 @@ exporter:
     nginx_retries: "0"
     nginx_retry_interval: "5s"
     resources: {}
+    securityContext:
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 65534
 
   phpfpm:
     image:
@@ -178,6 +199,13 @@ exporter:
     fix_process_count: false
     log_level: warn
     resources: {}
+    securityContext:
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 65534
 
 nodeSelector: {}
 

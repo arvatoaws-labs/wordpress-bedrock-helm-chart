@@ -19,6 +19,8 @@ spec:
           priorityClassName: background
           containers:
           - name: wordpress-cron
+            securityContext:
+            {{- toYaml .Values.php.securityContext | nindent 14 }}
             image: "{{ .Values.php.image.repository }}:{{ .Values.php.image.tag }}"
             imagePullPolicy: {{ .Values.php.image.pullPolicy }}
             workingDir: /app
@@ -60,6 +62,8 @@ spec:
               readOnly: true
             - name: web-volume
               mountPath: /var/www/html
+            resources:
+              {{- toYaml .Values.php.resources | nindent 14 }}
           restartPolicy: OnFailure
           volumes:
           - name: config-volume

@@ -62,10 +62,14 @@ spec:
             name: config-volume
             subPath: fpm.conf
             readOnly: true
+          - mountPath: /tmp
+            name: tmp-volume
       {{- end }}
       {{- end }}
       restartPolicy: Never
       volumes:
+      - name: tmp-volume
+        emptyDir: {}
       - name: config-volume
         configMap:
           # Provide the name of the ConfigMap containing the files you want
