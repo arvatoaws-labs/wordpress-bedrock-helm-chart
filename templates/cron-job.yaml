@@ -60,8 +60,9 @@ spec:
               name: config-volume
               subPath: php-fpm.conf
               readOnly: true
-            - name: web-volume
-              mountPath: /var/www/html
+            - name: tmp-volume
+              mountPath: /tmp
+              readOnly: false
             resources:
               {{- toYaml .Values.php.resources | nindent 14 }}
           restartPolicy: OnFailure
@@ -71,5 +72,5 @@ spec:
               # Provide the name of the ConfigMap containing the files you want
               # to add to the container
               name: {{ include "wordpress-bedrock.fullname" . }}
-          - name: web-volume
+          - name: tmp-volume
             emptyDir: {}
