@@ -71,6 +71,9 @@ spec:
           - name: nginx-cache-volume
             mountPath: /var/cache/nginx
             readOnly: false
+          - name: nginx-var-run-volume
+            mountPath: /var/run
+            readOnly: false
           resources:
             {{- toYaml .Values.nginx.resources | nindent 12 }}
         - name: {{ .Chart.Name }}-php-fpm
@@ -192,6 +195,8 @@ spec:
       - name: tmp-volume
         emptyDir: {}
       - name: nginx-cache-volume
+        emptyDir: {}
+      - name: nginx-var-run-volume
         emptyDir: {}
       - name: web-volume
         emptyDir: {}
