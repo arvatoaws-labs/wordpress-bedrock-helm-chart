@@ -77,6 +77,8 @@ data:
         server_name_in_redirect off;
         port_in_redirect off;
 
+        keepalive_timeout 20;
+
         client_max_body_size {{ .Values.nginx.client_max_body_size }};
 
         {{ $length := len $.Values.nginx.cors_origins }} {{ if gt $length 0 }}

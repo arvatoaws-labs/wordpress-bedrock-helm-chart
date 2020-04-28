@@ -74,6 +74,14 @@ spec:
           - name: nginx-var-run-volume
             mountPath: /var/run
             readOnly: false
+          lifecycle:
+            preStop:
+              exec:
+                # SIGTERM triggers a quick exit; gracefully terminate instead
+                command:
+                  - /bin/bash
+                  - -c
+                  - "sleep 30 && /usr/sbin/nginx -s quit"
           resources:
             {{- toYaml .Values.nginx.resources | nindent 12 }}
         - name: {{ .Chart.Name }}-php-fpm
@@ -95,6 +103,13 @@ spec:
             readOnly: true
           - name: tmp-volume
             mountPath: /tmp
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - /bin/bash
+                  - -c
+                  - "sleep 30"
           env:
           {{ if $.Values.offload.bucket }}
             - name: WP_OFFLOAD_BUCKET
