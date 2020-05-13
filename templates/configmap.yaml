@@ -205,6 +205,31 @@ data:
           stub_status on;
           access_log off;
           allow 127.0.0.1;
+          allow 10.0.0.0/8;
+          allow 172.16.0.0/12;
+          allow 192.168.0.0/16;
+          deny all;
+        }
+
+        # nginx ping
+        location ~ /nginx-ping {
+          return 200 "pong";
+          access_log off;
+          allow 127.0.0.1;
+          allow 10.0.0.0/8;
+          allow 172.16.0.0/12;
+          allow 192.168.0.0/16;
+          deny all;
+        }
+
+        # nginx monitor
+        location ~ /nginx-status {
+          stub_status on;
+          access_log off;
+          allow 127.0.0.1;
+          allow 10.0.0.0/8;
+          allow 172.16.0.0/12;
+          allow 192.168.0.0/16;
           deny all;
         }
     }
