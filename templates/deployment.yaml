@@ -58,7 +58,7 @@ spec:
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /wp/wp-login.php
+              path: /nginx-status
               port: http
           readinessProbe:
             httpGet:
