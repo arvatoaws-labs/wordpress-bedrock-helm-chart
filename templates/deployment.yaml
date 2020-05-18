@@ -4,6 +4,10 @@ metadata:
   name: {{ include "wordpress-bedrock.fullname" . }}
   labels:
 {{ include "wordpress-bedrock.labels" . | indent 4 }}
+  annotations:
+    {{- if .Values.wordpress.uptime }}
+    downscaler/uptime: {{.Values.wordpress.uptime}}
+    {{- end }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
