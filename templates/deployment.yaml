@@ -68,6 +68,9 @@ spec:
           - name: web-volume
             mountPath: /var/www/html
             readOnly: true
+          - name: uploads-volume
+            mountPath: /var/www/html/web/app/uploads
+            readOnly: true
           - name: nginx-cache-volume
             mountPath: /var/cache/nginx
             readOnly: false
@@ -101,8 +104,12 @@ spec:
           - name: web-volume
             mountPath: /var/www/html
             readOnly: true
+          - name: uploads-volume
+            mountPath: /var/www/html/web/app/uploads
+            readOnly: false
           - name: tmp-volume
             mountPath: /tmp
+            readOnly: false
           lifecycle:
             preStop:
               exec:
@@ -214,6 +221,8 @@ spec:
       - name: nginx-var-run-volume
         emptyDir: {}
       - name: web-volume
+        emptyDir: {}
+      - name: uploads-volume
         emptyDir: {}
       {{- with .Values.nodeSelector }}
       nodeSelector:
