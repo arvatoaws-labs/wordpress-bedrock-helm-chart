@@ -12,4 +12,8 @@ spec:
       image: busybox
       command: ['wget']
       args:  ['{{ include "wordpress-bedrock.fullname" . }}:{{ .Values.service.port }}']
+      resources:
+        requests:
+          cpu: 0.01
+          memory: 32Mi
   restartPolicy: Never
