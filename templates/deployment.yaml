@@ -235,6 +235,27 @@ spec:
     {{- with .Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
+    {{ else }}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app.kubernetes.io/instance
+                  operator: In
+                  values:
+                  - {{ include "wordpress-bedrock.name" . }}
+              topologyKey: failure-domain.beta.kubernetes.io/zone
+            weight: 100
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app.kubernetes.io/instance
+                operator: In
+                values:
+                - {{ include "wordpress-bedrock.name" . }}
+            topologyKey: kubernetes.io/hostname
     {{- end }}
     {{- with .Values.tolerations }}
       tolerations:
