@@ -209,6 +209,15 @@ exporter:
       runAsNonRoot: true
       runAsUser: 65534
 
+hpa:
+  enabled: true
+  maxReplicas: 10
+  targets:
+    cpu: 70
+    memory: 70
+    php: 7
+    nginx: 1000
+
 nodeSelector: {}
 
 tolerations: []
