@@ -76,6 +76,7 @@ data:
 
         server_name_in_redirect off;
         port_in_redirect off;
+        absolute_redirect off;
 
         keepalive_timeout 20;
 
