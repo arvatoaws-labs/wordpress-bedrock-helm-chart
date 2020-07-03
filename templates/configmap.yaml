@@ -131,6 +131,9 @@ data:
 
         {{ if .Values.offload.cloudfront }}
         # offload uploads to s3
+        location ^~ /app/uploads/ {
+          rewrite "^/app/uploads/(.*)$" "https://{{ .Values.offload.cloudfront }}/wp-content/uploads/$1" break;
+        }
         location ^~ /wp/wp-content/uploads/ {
           rewrite "^/wp/wp-content/uploads/(.*)$" "https://{{ .Values.offload.cloudfront }}/wp-content/uploads/$1" break;
         }
