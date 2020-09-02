@@ -8,6 +8,7 @@ metadata:
     {{- if .Values.wordpress.uptime }}
     downscaler/uptime: {{.Values.wordpress.uptime}}
     {{- end }}
+    checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
 spec:
   schedule: "{{ .Values.wordpress.cron_schedule }}"
   concurrencyPolicy: Replace
@@ -15,6 +16,24 @@ spec:
   jobTemplate:
     spec:
       template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: {{ include "wordpress-bedrock.name" . }}
+            app.kubernetes.io/instance: {{ .Release.Name }}
+          {{- if .Values.podLabels }}
+            ## Custom pod labels
+            {{- range $key, $value := .Values.podLabels }}
+            {{ $key }}: {{ $value | quote }}
+            {{- end }}
+          {{- end }}
+          annotations:
+            checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+          {{- if .Values.podAnnotations }}
+            ## Custom pod annotations
+            {{- range $key, $value := .Values.podAnnotations }}
+            {{ $key }}: {{ $value | quote }}
+            {{- end }}
+          {{- end }}
         spec:
           priorityClassName: background
           containers:
