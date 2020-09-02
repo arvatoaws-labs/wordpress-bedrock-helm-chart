@@ -11,6 +11,16 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
+{{- if ( .Values.monitoring.enabled ) }}
+    - port: {{ .Values.exporter.nginx.port }}
+      targetPort: nginx-metrics
+      protocol: TCP
+      name: nginx-metrics
+    - port: {{ .Values.exporter.phpfpm.port }}
+      targetPort: php-fpm-metrics
+      protocol: TCP
+      name: php-fpm-metrics
+{{ end }}
   selector:
     app.kubernetes.io/name: {{ include "wordpress-bedrock.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
