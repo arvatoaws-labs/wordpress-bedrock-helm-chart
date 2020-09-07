@@ -18,7 +18,7 @@ spec:
       template:
         metadata:
           labels:
-            app.kubernetes.io/name: {{ include "wordpress-bedrock.name" . }}
+            app.kubernetes.io/name: {{ include "wordpress-bedrock.name" . }}-cron
             app.kubernetes.io/instance: {{ .Release.Name }}
           {{- if .Values.podLabels }}
             ## Custom pod labels
