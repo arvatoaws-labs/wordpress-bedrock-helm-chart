@@ -130,6 +130,17 @@ data:
         }
 
         {{ if .Values.offload.cloudfront }}
+        {{ if .Values.efs.enabled }}
+        location ^~ /app/uploads/et-cache/ {
+          root /var/www/html/web/wp/wp-content/uploads/et-cache/;
+        }
+        location ^~ /wp-content/uploads/et-cache/ {
+          root /var/www/html/web/wp/wp-content/uploads/et-cache/;
+        }
+        location ^~ /wp/wp-content/uploads/et-cache/ {
+          root /var/www/html/web/wp/wp-content/uploads/et-cache/;
+        }
+        {{ end }}
         # offload uploads to s3
         location ^~ /app/uploads/ {
           rewrite "^/app/uploads/(.*)$" "https://{{ .Values.offload.cloudfront }}/wp-content/uploads/$1" break;

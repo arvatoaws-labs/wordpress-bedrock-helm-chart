@@ -49,11 +49,8 @@ ingress:
 efs:
   enabled: false
   # fsid: fs-12345
-  # subpath: project
+  # subPath: project
   awsRegion: eu-central-1
-  # volumeMounts:
-  # - name: efs
-  #   mountPath: /app/shared
 
 nginx:
   image:

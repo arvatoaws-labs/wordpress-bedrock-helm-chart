@@ -83,7 +83,9 @@ spec:
               mountPath: /tmp
               readOnly: false
 {{- if .Values.efs.enabled }}
-{{ toYaml .Values.efs.volumeMounts | indent 12 }}
+          - name: efs-volume
+            mountPath: /var/www/html/web/wp/wp-content/uploads/et-cache/
+            readOnly: false
 {{- end }}
             resources:
               {{- toYaml .Values.php.resources | nindent 14 }}
