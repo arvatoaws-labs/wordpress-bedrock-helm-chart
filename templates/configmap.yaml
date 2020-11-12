@@ -132,13 +132,13 @@ data:
         {{ if .Values.offload.cloudfront }}
         {{ if .Values.efs.enabled }}
         location ^~ /app/uploads/et-cache/ {
-          root /var/www/html/web/wp/wp-content/uploads/et-cache/;
+          root /var/www/html/web/app/uploads/et-cache/;
         }
         location ^~ /wp-content/uploads/et-cache/ {
-          root /var/www/html/web/wp/wp-content/uploads/et-cache/;
+          root /var/www/html/web/app/uploads/et-cache/;
         }
         location ^~ /wp/wp-content/uploads/et-cache/ {
-          root /var/www/html/web/wp/wp-content/uploads/et-cache/;
+          root /var/www/html/web/app/uploads/et-cache/;
         }
         {{ end }}
         # offload uploads to s3

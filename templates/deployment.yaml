@@ -86,7 +86,7 @@ spec:
             readOnly: false
 {{- if .Values.efs.enabled }}
           - name: efs-volume
-            mountPath: /var/www/html/web/wp/wp-content/uploads/et-cache/
+            mountPath: /var/www/html/web/app/uploads/et-cache/
             readOnly: false
 {{- end }}
           lifecycle:
@@ -124,7 +124,7 @@ spec:
             readOnly: false
 {{- if .Values.efs.enabled }}
           - name: efs-volume
-            mountPath: /var/www/html/web/wp/wp-content/uploads/et-cache/
+            mountPath: /var/www/html/web/app/uploads/et-cache/
             readOnly: false
 {{- end }}
           lifecycle:
