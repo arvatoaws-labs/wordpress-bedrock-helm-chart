@@ -241,7 +241,7 @@ spec:
       - name: efs
         nfs:
           path: /{{ .Values.efs.subPath }}
-          server: {{ .Values.efs.fsid }}.efs.{{ .Values.efs.aws-region }}.amazonaws.com
+          server: {{ .Values.efs.fsid }}.efs.{{ .Values.efs.awsRegion }}.amazonaws.com
 {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:

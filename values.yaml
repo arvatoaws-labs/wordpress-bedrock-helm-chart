@@ -50,7 +50,7 @@ efs:
   enabled: false
   # fsid: fs-12345
   # subpath: project
-  aws-region: eu-central-1
+  awsRegion: eu-central-1
   # volumeMounts:
   # - name: efs
   #   mountPath: /app/shared
