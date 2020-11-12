@@ -47,7 +47,9 @@ spec:
             mountPath: /var/www/html
             readOnly: false
 {{- if .Values.efs.enabled }}
-{{ toYaml .Values.efs.volumeMounts | indent 10 }}
+          - name: efs-volume
+            mountPath: /var/www/html/web/app/uploads/et-cache/
+            readOnly: false
 {{- end }}
       containers:
         - name: {{ .Chart.Name }}-nginx
