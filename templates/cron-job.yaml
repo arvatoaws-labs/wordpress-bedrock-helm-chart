@@ -83,9 +83,9 @@ spec:
               mountPath: /tmp
               readOnly: false
 {{- if .Values.efs.enabled }}
-          - name: efs-volume
-            mountPath: /var/www/html/web/app/uploads/et-cache/
-            readOnly: false
+            - name: efs-volume
+              mountPath: /var/www/html/web/app/uploads/et-cache/
+              readOnly: false
 {{- end }}
             resources:
               {{- toYaml .Values.php.resources | nindent 14 }}
