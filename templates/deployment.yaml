@@ -38,6 +38,7 @@ spec:
       initContainers:
         - name: copy-files
           securityContext:
+            fsGroup: 2000
             {{- toYaml .Values.php.securityContext | nindent 12 }}
           image: "{{ .Values.php.image.repository }}:{{ .Values.php.image.tag }}"
           imagePullPolicy: {{ .Values.php.image.pullPolicy }}
