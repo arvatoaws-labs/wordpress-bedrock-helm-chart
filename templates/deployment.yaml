@@ -41,7 +41,7 @@ spec:
             {{- toYaml .Values.php.securityContext | nindent 12 }}
           image: "{{ .Values.php.image.repository }}:{{ .Values.php.image.tag }}"
           imagePullPolicy: {{ .Values.php.image.pullPolicy }}
-          command: ['sh', '-c', 'cp -r /app/* /var/www/html']
+          command: ['sh', '-c', 'chown -R www-data: /var/www/html && cp -r /app/* /var/www/html']
           volumeMounts:
           - name: web-volume
             mountPath: /var/www/html
