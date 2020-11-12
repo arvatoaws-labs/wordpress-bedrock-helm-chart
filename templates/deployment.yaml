@@ -47,7 +47,7 @@ spec:
             mountPath: /var/www/html
             readOnly: false
 {{- if .Values.efs.enabled }}
-          - name: efs-volume
+          - name: efs
             mountPath: /var/www/html/web/app/uploads/et-cache/
             readOnly: false
 {{- end }}
@@ -87,7 +87,7 @@ spec:
             mountPath: /var/run
             readOnly: false
 {{- if .Values.efs.enabled }}
-          - name: efs-volume
+          - name: efs
             mountPath: /var/www/html/web/app/uploads/et-cache/
             readOnly: false
 {{- end }}
@@ -125,7 +125,7 @@ spec:
             mountPath: /tmp
             readOnly: false
 {{- if .Values.efs.enabled }}
-          - name: efs-volume
+          - name: efs
             mountPath: /var/www/html/web/app/uploads/et-cache/
             readOnly: false
 {{- end }}
