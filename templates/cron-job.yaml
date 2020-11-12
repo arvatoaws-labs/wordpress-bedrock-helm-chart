@@ -82,6 +82,9 @@ spec:
             - name: tmp-volume
               mountPath: /tmp
               readOnly: false
+{{- if .Values.efs.enabled }}
+{{ toYaml .Values.efs.volumeMounts | indent 12 }}
+{{- end }}
             resources:
               {{- toYaml .Values.php.resources | nindent 14 }}
           restartPolicy: OnFailure
@@ -93,3 +96,9 @@ spec:
               name: {{ include "wordpress-bedrock.fullname" . }}
           - name: tmp-volume
             emptyDir: {}
+{{- if .Values.efs.enabled }}
+          - name: efs
+            nfs:
+              path: /{{ .Values.efs.subPath }}
+              server: {{ .Values.efs.fsid }}.efs.{{ .Values.efs.aws-region }}.amazonaws.com
+{{- end }}

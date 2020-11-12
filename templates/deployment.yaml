@@ -46,6 +46,9 @@ spec:
           - name: web-volume
             mountPath: /var/www/html
             readOnly: false
+{{- if .Values.efs.enabled }}
+{{ toYaml .Values.efs.volumeMounts | indent 10 }}
+{{- end }}
       containers:
         - name: {{ .Chart.Name }}-nginx
           securityContext:
@@ -81,6 +84,9 @@ spec:
           - name: nginx-var-run-volume
             mountPath: /var/run
             readOnly: false
+{{- if .Values.efs.enabled }}
+{{ toYaml .Values.efs.volumeMounts | indent 10 }}
+{{- end }}
           lifecycle:
             preStop:
               exec:
@@ -114,6 +120,9 @@ spec:
           - name: tmp-volume
             mountPath: /tmp
             readOnly: false
+{{- if .Values.efs.enabled }}
+{{ toYaml .Values.efs.volumeMounts | indent 10 }}
+{{- end }}
           lifecycle:
             preStop:
               exec:
@@ -228,6 +237,12 @@ spec:
         emptyDir: {}
       - name: uploads-volume
         emptyDir: {}
+{{- if .Values.efs.enabled }}
+      - name: efs
+        nfs:
+          path: /{{ .Values.efs.subPath }}
+          server: {{ .Values.efs.fsid }}.efs.{{ .Values.efs.aws-region }}.amazonaws.com
+{{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

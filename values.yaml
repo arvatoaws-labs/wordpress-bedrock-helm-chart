@@ -46,6 +46,15 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
+efs:
+  enabled: false
+  # fsid: fs-12345
+  # subpath: project
+  aws-region: eu-central-1
+  # volumeMounts:
+  # - name: efs
+  #   mountPath: /app/shared
+
 nginx:
   image:
     repository: nginx
