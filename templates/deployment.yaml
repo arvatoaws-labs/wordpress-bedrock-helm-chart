@@ -117,7 +117,7 @@ spec:
             readOnly: true
           - name: web-volume
             mountPath: /var/www/html
-            readOnly: true
+            readOnly: {{ .Values.php.readOnlyWebFilesystem }}
           - name: uploads-volume
             mountPath: /var/www/html/web/app/uploads
             readOnly: false
