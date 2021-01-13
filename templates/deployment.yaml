@@ -48,7 +48,7 @@ spec:
             readOnly: false
 {{- if .Values.efs.enabled }}
           - name: efs
-            mountPath: /var/www/html/web/app/uploads/et-cache/
+            mountPath: /var/www/html/web/{{ .Values.efs.mountPath }}
             readOnly: false
 {{- end }}
       containers:
@@ -88,7 +88,7 @@ spec:
             readOnly: false
 {{- if .Values.efs.enabled }}
           - name: efs
-            mountPath: /var/www/html/web/app/uploads/et-cache/
+            mountPath: /var/www/html/web/{{ .Values.efs.mountPath }}
             readOnly: false
 {{- end }}
           lifecycle:
@@ -126,7 +126,7 @@ spec:
             readOnly: false
 {{- if .Values.efs.enabled }}
           - name: efs
-            mountPath: /var/www/html/web/app/uploads/et-cache/
+            mountPath: /var/www/html/web/{{ .Values.efs.mountPath }}
             readOnly: false
 {{- end }}
           lifecycle:
