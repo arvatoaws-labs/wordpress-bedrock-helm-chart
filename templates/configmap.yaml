@@ -162,20 +162,6 @@ data:
         }
 
         {{ if .Values.offload.cloudfront }}
-        {{ if .Values.efs.enabled }}
-        location ^~ /app/uploads/et-cache/ {
-          index  index.php index.html index.htm;
-          try_files $uri $uri/ /index.php?path=$uri&$args;
-        }
-        location ^~ /wp-content/uploads/et-cache/ {
-          index  index.php index.html index.htm;
-          try_files $uri $uri/ /index.php?path=$uri&$args;
-        }
-        location ^~ /wp/wp-content/uploads/et-cache/ {
-          index  index.php index.html index.htm;
-          try_files $uri $uri/ /index.php?path=$uri&$args;
-        }
-        {{ end }}
         # offload uploads to s3
         location ^~ /app/uploads/ {
           rewrite "^/app/uploads/(.*)$" "https://{{ .Values.offload.cloudfront }}/wp-content/uploads/$1" break;
