@@ -50,6 +50,7 @@ efs:
   enabled: false
   # fsid: fs-12345
   # subPath: project
+  # mountPath: container-mount-path-relative-to-webroot
   awsRegion: eu-central-1
 
 nginx:
