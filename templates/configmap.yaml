@@ -49,7 +49,12 @@ data:
         server 127.0.0.1:9000 max_conns={{ .Values.php.fpm.pm.max_children }};
     }
 
+    # Hide nginx version
     server_tokens off;
+
+    # Hide PHP version
+    fastcgi_hide_header X-Powered-By;
+    proxy_hide_header X-Powered-By;
 
     real_ip_header X-Forwarded-For;
     set_real_ip_from 0.0.0.0/0;
