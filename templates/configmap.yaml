@@ -74,7 +74,7 @@ data:
     {{ end }}
 
     {{ if .Values.nginx.rate_limit_login.enabled }}
-    limit_req_zone $binary_remote_addr zone=login:10m rate={{ .Values.nginx.rate_limit_login.request_per_second }}r/s;
+    limit_req_zone $binary_remote_addr zone=login:{{ .Values.nginx.rate_limit_login.zone_memory_size }} rate={{ .Values.nginx.rate_limit_login.requests_per_second }}r/s;
     {{ end }}
 
     server {
@@ -206,7 +206,7 @@ data:
         location ~ \.php$ {
             {{ if .Values.nginx.rate_limit_login.enabled }}
             location ~ \wp-login.php$ {
-              limit_req zone=login burst={{ .Values.nginx.rate_limit_login.burst }} nodelay;
+              limit_req zone=login burst={{ .Values.nginx.rate_limit_login.requests_burst }} nodelay;
               fastcgi_pass   php-backend;
               fastcgi_index  index.php;
               fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
