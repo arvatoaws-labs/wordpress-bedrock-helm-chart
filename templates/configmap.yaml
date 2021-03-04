@@ -136,10 +136,7 @@ data:
         {{ end }}
 
         # default files forbidden due to version info
-        location ^~ /readme.html {
-          return 403;
-        }
-        location ^~ /license.html {
+        location ~* /((package|package-lock)\.json|composer\.(json|lock)|changelog\.txt|readme\.(txt|html)|license\.(txt|html)|.*\.md)$ {
           return 403;
         }
 
