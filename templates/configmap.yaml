@@ -73,6 +73,10 @@ data:
     }
     {{ end }}
 
+    {{ if .Values.nginx.rate_limit_login.enabled }}
+    limit_req_zone $binary_remote_addr zone=login:10m rate={{ .Values.nginx.rate_limit_login.request_per_second }}r/s;
+    {{ end }}
+
     server {
         listen       8080;
         server_name {{ index $.Values.ingress.hosts 0 "host" | quote }};
@@ -203,6 +207,15 @@ data:
         # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
         #
         location ~ \.php$ {
+            {{ if .Values.nginx.rate_limit_login.enabled }}
+            location ~ \wp-login.php$ {
+              limit_req zone=login burst={{ .Values.nginx.rate_limit_login.burst }} nodelay;
+              fastcgi_pass   php-backend;
+              fastcgi_index  index.php;
+              fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+              include        fastcgi_params;
+            }
+            {{ end }}
             fastcgi_pass   php-backend;
             fastcgi_index  index.php;
             fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
