@@ -63,7 +63,7 @@ nginx:
   client_max_body_size: 10M
   cors_origins: []
   rate_limit_login:
-    enabled: true
+    enabled: false
     zone_memory_size: 10m
     requests_per_second: 1
     requests_burst: 2
