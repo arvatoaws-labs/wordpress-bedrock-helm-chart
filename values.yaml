@@ -62,6 +62,11 @@ nginx:
   disallow_robots: false
   client_max_body_size: 10M
   cors_origins: []
+  rate_limit_login:
+    enabled: false
+    zone_memory_size: 10m
+    requests_per_second: 1
+    requests_burst: 2
   # this document will be attached to the nginx server block
   additional_config:
   securityContext:

@@ -49,7 +49,12 @@ data:
         server 127.0.0.1:9000 max_conns={{ .Values.php.fpm.pm.max_children }};
     }
 
+    # Hide nginx version
     server_tokens off;
+
+    # Hide PHP version
+    fastcgi_hide_header X-Powered-By;
+    proxy_hide_header X-Powered-By;
 
     real_ip_header X-Forwarded-For;
     set_real_ip_from 0.0.0.0/0;
@@ -66,6 +71,10 @@ data:
       {{- range $value := $.Values.nginx.cors_origins }}
       "{{ $value }}" "true";{{ end }}
     }
+    {{ end }}
+
+    {{ if .Values.nginx.rate_limit_login.enabled }}
+    limit_req_zone $binary_remote_addr zone=login:{{ .Values.nginx.rate_limit_login.zone_memory_size }} rate={{ .Values.nginx.rate_limit_login.requests_per_second }}r/s;
     {{ end }}
 
     server {
@@ -127,10 +136,7 @@ data:
         {{ end }}
 
         # default files forbidden due to version info
-        location ^~ /readme.html {
-          return 403;
-        }
-        location ^~ /license.html {
+        location ~* /((package|package-lock)\.json|composer\.(json|lock)|changelog\.txt|readme\.(txt|html)|license\.(txt|html)|.*\.md)$ {
           return 403;
         }
 
@@ -198,13 +204,22 @@ data:
         # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
         #
         location ~ \.php$ {
+            {{ if .Values.nginx.rate_limit_login.enabled }}
+            location ~ \wp-login.php$ {
+              limit_req zone=login burst={{ .Values.nginx.rate_limit_login.requests_burst }} nodelay;
+              fastcgi_pass   php-backend;
+              fastcgi_index  index.php;
+              fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+              include        fastcgi_params;
+            }
+            {{ end }}
             fastcgi_pass   php-backend;
             fastcgi_index  index.php;
             fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
             include        fastcgi_params;
         }
 
-        location ~* ^.+\.(ogg|ogv|svg|svgz|eot|otf|woff|mp4|ttf|rss|atom|jpg|jpeg|gif|png|ico|zip|tgz|gz|rar|bz2|doc|xls|exe|ppt|tar|mid|midi|wav|bmp|rtf)$ {
+        location ~* ^.+\.(ogg|ogv|svg|svgz|eot|otf|woff|woff2|mp4|ttf|rss|atom|jpg|jpeg|gif|png|webp|ico|zip|tgz|gz|rar|bz2|doc|xls|exe|ppt|tar|mid|midi|wav|bmp|rtf)$ {
           #access_log off;
           log_not_found off;
           expires max;
