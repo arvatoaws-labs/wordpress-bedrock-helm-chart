@@ -36,6 +36,9 @@ spec:
           {{- end }}
         spec:
           priorityClassName: background
+          serviceAccountName: {{ template "wordpress-bedrock.serviceAccountName" . }}
+          securityContext:
+            {{- toYaml .Values.podSecurityContext | nindent 12 }}
           containers:
           - name: wordpress-cron
             securityContext:

@@ -20,6 +20,10 @@ spec:
     spec:
       containers:
       - name: job-done
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
         image: busybox
         command: ['sh', '-c', 'sleep 60']
       restartPolicy: Never

@@ -54,3 +54,10 @@ Create the name of the service account to use
     {{ default "default" .Values.serviceAccount.name }}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Expand the name of the chart.
+*/}}
+{{- define "wordpress-bedrock.efsSubPath" -}}
+{{- default .Release.Name .Values.efs.subPath | trunc 63 | trimSuffix "-" -}}
+{{- end -}}

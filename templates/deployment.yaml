@@ -86,10 +86,8 @@ spec:
           - name: nginx-var-run-volume
             mountPath: /var/run
             readOnly: false
-{{- if .Values.efs.enabled }}
-          - name: efs
-            mountPath: /var/www/html/web/{{ .Values.efs.mountPath }}
-            readOnly: false
+{{- if .Values.nginx.extraVolumeMounts }}
+          {{- toYaml .Values.nginx.extraVolumeMounts | nindent 10 }}
 {{- end }}
           lifecycle:
             preStop:
@@ -124,10 +122,8 @@ spec:
           - name: tmp-volume
             mountPath: /tmp
             readOnly: false
-{{- if .Values.efs.enabled }}
-          - name: efs
-            mountPath: /var/www/html/web/{{ .Values.efs.mountPath }}
-            readOnly: false
+{{- if .Values.php.extraVolumeMounts }}
+          {{- toYaml .Values.php.extraVolumeMounts | nindent 10 }}
 {{- end }}
           lifecycle:
             preStop:
@@ -243,10 +239,16 @@ spec:
         emptyDir: {}
       - name: uploads-volume
         emptyDir: {}
+{{- range $key, $value := .Values.php.extraVolumeMounts }}
+{{ if not (contains "efs" $value.name ) }}
+      - name: {{ $value.name }}
+        emptyDir: {}
+{{- end }}
+{{- end }}
 {{- if .Values.efs.enabled }}
       - name: efs
         nfs:
-          path: /{{ .Values.efs.subPath }}
+          path: /{{ include "wordpress-bedrock.efsSubPath" . }}
           server: {{ .Values.efs.fsid }}.efs.{{ .Values.efs.awsRegion }}.amazonaws.com
 {{- end }}
       {{- with .Values.nodeSelector }}

@@ -1,0 +1,32 @@
+
+
+efs:
+  enabled: true
+  fsid: fs-12345
+  #subPath: demo  # projekt verzeichnis, default release name
+  extraDirs:
+    - pluginA
+    - pluginB
+
+nginx:
+  extraVolumeMounts:
+    - name: test123-volume
+      mountPath: /var/www/html/web/app/test123
+      readOnly: true
+
+php:
+  extraVolumeMounts:
+    - name: test123-volume
+      mountPath: /var/www/html/web/app/test123
+      readOnly: false
+    - name: efs
+      mountPath: /var/www/html/web/app
+      readOnly: false
+    - name: efs
+      mountPath: /var/www/html/web/app/pluginA
+      subPath: pluginA
+      readOnly: false
+    - name: efs
+      mountPath: /var/www/html/web/app/pluginB
+      subPath: pluginB
+      readOnly: false

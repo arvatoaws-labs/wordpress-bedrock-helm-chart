@@ -49,9 +49,9 @@ ingress:
 efs:
   enabled: false
   # fsid: fs-12345
-  # subPath: project
-  # mountPath: container-mount-path-relative-to-webroot
+  # subPath: defaults to releasename
   awsRegion: eu-central-1
+  extraDirs: []
 
 nginx:
   image:
@@ -76,6 +76,7 @@ nginx:
     readOnlyRootFilesystem: true
     runAsNonRoot: true
     runAsUser: 101
+  extraVolumeMounts:  []
 
 php:
   image:
@@ -107,6 +108,7 @@ php:
     runAsNonRoot: true
     runAsUser: 82
   readOnlyWebFilesystem: true
+  extraVolumeMounts:  []
 
 ## Additional environment variables to set
 extraEnv: []
