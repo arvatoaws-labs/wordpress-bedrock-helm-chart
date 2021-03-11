@@ -46,11 +46,6 @@ spec:
           - name: web-volume
             mountPath: /var/www/html
             readOnly: false
-{{- if .Values.efs.enabled }}
-          - name: efs
-            mountPath: /var/www/html/web/{{ .Values.efs.mountPath }}
-            readOnly: false
-{{- end }}
       containers:
         - name: {{ .Chart.Name }}-nginx
           securityContext:
