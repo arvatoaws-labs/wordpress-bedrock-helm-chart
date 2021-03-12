@@ -4,12 +4,12 @@ This chart is for use with the wordpress bedrock. In order to use it you must bu
 
 The init container of this chart copies the content of /app to /var/www/html. The /var/www/html volume is shared between the nginx and the php-fpm container.
 
-The setup is tested on AWS EKS and sacles well. A typical setup would look like
+The setup is tested on AWS EKS and sacles well. A typical setup would look like this:
 
 ```
-Cloudfront (blog.example.com)     Cloudfront (static.example.com)
-       |                               |
-     AWS ALB                          S3 bucket (filled by wp offload plugin)
+Cloudfront (blog.example.com) <-> AWS WF       Cloudfront (static.example.com)
+       |                                            |
+     AWS ALB                                     S3 bucket (filled by wp offload plugin)
        |
      AWS EKS Cluster
        |
@@ -17,7 +17,11 @@ Cloudfront (blog.example.com)     Cloudfront (static.example.com)
      |          |
    nginx      php-fpm
          |
-   shared volume
+   shared volume (EmptyDir synced from /app)
+   
+   
+         |
+      AWS RDS / aurora serverless
 
 ```
 
@@ -25,6 +29,7 @@ Cloudfront (blog.example.com)     Cloudfront (static.example.com)
 Features
 * seperate containers for nginx (offical image) and php-fpm (custom image)
 * seperate pod for cron jobs
+* secure default setup (read only volumes, non root containers, hide versions)
 * support for exporters and services monitors (see exporters and monitoring section in values.yaml)
 * support for wp media offload plugin (see offload section in values.yaml)
 * support for external secrets using paramater store (see externalSecrets section in values.yaml)
