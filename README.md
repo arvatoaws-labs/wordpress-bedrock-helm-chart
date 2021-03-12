@@ -34,7 +34,7 @@ Features
 * support for wp media offload plugin (see offload section in values.yaml)
 * support for external secrets using paramater store (see externalSecrets section in values.yaml)
 * support for pre-install, post-install, pre-upgrade and post-upgrade hooks (see hooks section in values.yaml)
-* support for hpa (static config 80% cpu usuage min replicaCount max 10)
+* support for hpa (based on cpu, memory, nginx and php connections see hpa section in values.yaml)
 * support for custom php config (see php section in values.yaml)
 * support for custom nginx config (see nginx section additional_config in values.yaml)
 * support for kube-downscaler (see wordpress uptime section in values.yaml)
