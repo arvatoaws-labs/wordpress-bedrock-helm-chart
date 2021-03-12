@@ -6,6 +6,7 @@ The init container of this chart copies the content of /app to /var/www/html. Th
 
 The setup is tested on AWS EKS and sacles well. A typical setup would look like
 
+```
 Cloudfront (blog.example.com)     Cloudfront (static.example.com)
        |                               |
      AWS ALB                          S3 bucket (filled by wp offload plugin)
@@ -18,6 +19,7 @@ Cloudfront (blog.example.com)     Cloudfront (static.example.com)
          |
    shared volume
 
+```
 
 
 Features
