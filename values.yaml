@@ -67,6 +67,9 @@ nginx:
     zone_memory_size: 10m
     requests_per_second: 1
     requests_burst: 2
+  cache_control:
+    expires: max
+    js_css_enabled: false
   # this document will be attached to the nginx server block
   additional_config:
   securityContext:
