@@ -219,12 +219,18 @@ data:
             include        fastcgi_params;
         }
 
-        location ~* ^.+\.({{ if .Values.nginx.cache_control.js_css_enabled }}js|css|{{ end }}ogg|ogv|svg|svgz|eot|otf|woff|woff2|mp4|ttf|rss|atom|jpg|jpeg|gif|png|webp|ico|zip|tgz|gz|rar|bz2|doc|xls|exe|ppt|tar|mid|midi|wav|bmp|rtf)$ {
+        location ~* ^.+\.(ogg|ogv|svg|svgz|eot|otf|woff|woff2|mp3|mp4|ttf|rss|atom|jpg|jpeg|gif|png|webp|ico|zip|tgz|gz|rar|bz2|doc|xls|exe|ppt|tar|mid|midi|wav|bmp|rtf)$ {
           #access_log off;
           log_not_found off;
           expires {{ .Values.nginx.cache_control.expires }};
         }
-
+        {{ if .Values.nginx.cache_control.js_css_enabled }}
+        location ~* ^.+\.(js|css)$ {
+          #access_log off;
+          log_not_found off;
+          expires {{ .Values.nginx.cache_control.expires }};
+        }
+        {{ end }}
         # deny access to .htaccess files, if Apache's document root
         # concurs with nginx's one
         #
