@@ -224,13 +224,15 @@ data:
           log_not_found off;
           expires {{ .Values.nginx.cache_control.expires }};
         }
-        {{ if .Values.nginx.cache_control.js_css_enabled }}
+
         location ~* ^.+\.(js|css)$ {
           #access_log off;
           log_not_found off;
+          {{ if .Values.nginx.cache_control.js_css_enabled }}
           expires {{ .Values.nginx.cache_control.expires }};
+          {{ end }}
         }
-        {{ end }}
+
         # deny access to .htaccess files, if Apache's document root
         # concurs with nginx's one
         #
