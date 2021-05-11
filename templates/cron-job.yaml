@@ -60,6 +60,7 @@ spec:
                 value: {{ $.Values.offload.cloudfront | quote }}
               - name: WP_OFFLOAD_LOCAL_DOMAINS
                 value: {{ $.Values.offload.local_domains | quote }}
+          {{- end }}
               - name: WP_DEFAULT_HOST
                 value: {{ index $.Values.ingress.hosts 0 "host" | quote }}
               - name: WP_PLUGINS
