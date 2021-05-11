@@ -69,7 +69,7 @@ nginx:
     requests_burst: 2
   cache_control:
     expires: max
-    js_css_enabled: true
+    js_css_enabled: false
   # this document will be attached to the nginx server block
   additional_config:
   securityContext:
