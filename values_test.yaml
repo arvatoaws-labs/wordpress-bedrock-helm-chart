@@ -30,3 +30,16 @@ php:
       mountPath: /var/www/html/web/app/pluginB
       subPath: pluginB
       readOnly: false
+
+externalSecrets:
+  enabled: true
+  #engine: kube-external-secrets
+  engine: external-secrets
+  backendType: systemManager
+  mapping:
+    db-root-username: /dev/wordpress-1/DB/username
+    db-root-password: /dev/wordpress-1/DB/password
+    db-username: /dev/exampleblog/DB/username
+    db-password: /dev/exampleblog/DB/password
+    wordpress-username: /dev/exampleblog/wordpress/username
+    wordpress-password: /dev/exampleblog/wordpress/password
