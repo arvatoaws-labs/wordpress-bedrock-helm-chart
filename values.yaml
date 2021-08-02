@@ -167,6 +167,7 @@ hooks:
 externalSecrets:
   enabled: false
   engine: kube-external-secrets # external-secrets
+  refreshInterval: 0
   region: eu-central-1
   backendType: systemManager
   mapping:
