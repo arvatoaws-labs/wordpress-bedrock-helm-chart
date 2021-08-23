@@ -43,3 +43,6 @@ externalSecrets:
     db-password: /dev/exampleblog/DB/password
     wordpress-username: /dev/exampleblog/wordpress/username
     wordpress-password: /dev/exampleblog/wordpress/password
+
+hpa:
+  engine: keda

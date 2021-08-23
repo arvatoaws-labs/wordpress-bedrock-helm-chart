@@ -1,4 +1,5 @@
 {{- if .Values.hpa.enabled }}
+{{- if eq .Values.hpa.engine "prometheus-adapter" }}
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
@@ -39,4 +40,43 @@ spec:
       target:
         type: AverageValue
         averageValue: {{ .Values.hpa.targets.nginx }}
+{{- end }}
+{{- if eq .Values.hpa.engine "keda" }}
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ include "wordpress-bedrock.fullname" . }}
+  labels:
+{{ include "wordpress-bedrock.labels" . | indent 4 }}
+spec:
+  scaleTargetRef:
+    name: {{ include "wordpress-bedrock.fullname" . }}
+  pollingInterval: 30
+  cooldownPeriod:  300
+  minReplicaCount: {{ .Values.replicaCount }}
+  maxReplicaCount: {{ .Values.hpa.maxReplicas }}
+  triggers:
+  - type: cpu
+    metadata:
+      # Required
+      type: AverageValue
+      value: "{{ .Values.hpa.targets.cpu }}"
+  - type: memory
+    metadata:
+      # Required
+      type: AverageValue
+      value: "{{ .Values.hpa.targets.memory }}"
+  - type: prometheus
+    metadata:
+      serverAddress: "{{ .Values.hpa.prometheus.serverAddress }}"
+      metricName: phpfpm_active_processes
+      threshold: '{{ .Values.hpa.targets.php }}'
+      query: avg(phpfpm_active_processes{service="{{ include "wordpress-bedrock.fullname" . }},namespace={{ .Release.Namespsace }}})
+  - type: prometheus
+    metadata:
+      serverAddress: "{{ .Values.hpa.prometheus.serverAddress }}"
+      metricName: nginx_connections_active
+      threshold: '{{ .Values.hpa.targets.nginx }}'
+      query: avg(nginx_connections_active{service="{{ include "wordpress-bedrock.fullname" . }},namespace={{ .Release.Namespsace }}})
+{{- end }}
 {{- end }}

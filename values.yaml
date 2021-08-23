@@ -232,6 +232,9 @@ exporter:
 
 hpa:
   enabled: true
+  engine: prometheus-adapter # keda
+  prometheus:
+    serverAddress: http://prometheus-operated.monitoring.svc.cluster.local:9090
   maxReplicas: 10
   targets:
     cpu: 70
