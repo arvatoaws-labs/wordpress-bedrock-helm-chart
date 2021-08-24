@@ -58,25 +58,23 @@ spec:
   triggers:
   - type: cpu
     metadata:
-      # Required
-      type: AverageValue
+      type: Utilization
       value: "{{ .Values.hpa.targets.cpu }}"
   - type: memory
     metadata:
-      # Required
-      type: AverageValue
+      type: Utilization
       value: "{{ .Values.hpa.targets.memory }}"
   - type: prometheus
     metadata:
       serverAddress: "{{ .Values.hpa.prometheus.serverAddress }}"
       metricName: phpfpm_active_processes
       threshold: '{{ .Values.hpa.targets.php }}'
-      query: avg(phpfpm_active_processes{service="{{ include "wordpress-bedrock.fullname" . }},namespace={{ .Release.Namespsace }}})
+      query: sum(phpfpm_active_processes{service="{{ include "wordpress-bedrock.fullname" . }}",namespace="{{ .Release.Namespace }}"})
   - type: prometheus
     metadata:
       serverAddress: "{{ .Values.hpa.prometheus.serverAddress }}"
       metricName: nginx_connections_active
       threshold: '{{ .Values.hpa.targets.nginx }}'
-      query: avg(nginx_connections_active{service="{{ include "wordpress-bedrock.fullname" . }},namespace={{ .Release.Namespsace }}})
+      query: sum(nginx_connections_active{service="{{ include "wordpress-bedrock.fullname" . }}",namespace="{{ .Release.Namespace }}"})
 {{- end }}
 {{- end }}
