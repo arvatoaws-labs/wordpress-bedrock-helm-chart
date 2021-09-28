@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - name: job-done
-        image: busybox
+        image: public.ecr.aws/runecast/busybox:1.33.1
         command: ['sh', '-c', 'echo "all jobs completed"']
       initContainers:
       {{- if $hookvalue }}
