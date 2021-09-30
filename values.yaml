@@ -55,8 +55,8 @@ efs:
 
 nginx:
   image:
-    repository: nginx
-    tag: 1.19.10
+    repository: public.ecr.aws/nginx/nginx
+    tag: 1.21
     pullPolicy: IfNotPresent
   resources: {}
   disallow_robots: false
