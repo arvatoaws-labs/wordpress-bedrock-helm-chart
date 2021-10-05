@@ -166,7 +166,7 @@ hooks:
 # this section allows to inject external secrets into the wordpress deployment
 externalSecrets:
   enabled: false
-  engine: kube-external-secrets # external-secrets
+  engine: external-secrets # kube-external-secrets
   refreshInterval: "0"
   region: eu-central-1
   backendType: systemManager
@@ -232,7 +232,7 @@ exporter:
 
 hpa:
   enabled: true
-  engine: prometheus-adapter # keda
+  engine: keda # prometheus-adapter
   prometheus:
     serverAddress: http://prometheus-operated.monitoring.svc.cluster.local:9090
   maxReplicas: 10
