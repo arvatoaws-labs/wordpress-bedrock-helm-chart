@@ -211,12 +211,16 @@ data:
               fastcgi_index  index.php;
               fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
               include        fastcgi_params;
+              fastcgi_buffers {{ .Values.nginx.fastcgi_buffers_number .Values.nginx.fastcgi_buffers_size }};
+              fastcgi_buffer_size  {{ .Values.nginx.fastcgi_buffer_size }};
             }
             {{ end }}
             fastcgi_pass   php-backend;
             fastcgi_index  index.php;
             fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
             include        fastcgi_params;
+            fastcgi_buffers {{ .Values.nginx.fastcgi_buffers_number .Values.nginx.fastcgi_buffers_size }};
+            fastcgi_buffer_size  {{ .Values.nginx.fastcgi_buffer_size }};
         }
 
         location ~* ^.+\.(ogg|ogv|svg|svgz|eot|otf|woff|woff2|mp3|mp4|ttf|rss|atom|jpg|jpeg|gif|png|webp|ico|zip|tgz|gz|rar|bz2|doc|xls|exe|ppt|tar|mid|midi|wav|bmp|rtf)$ {
