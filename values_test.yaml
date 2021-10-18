@@ -35,6 +35,7 @@ externalSecrets:
   enabled: true
   #engine: kube-external-secrets
   engine: external-secrets
+  region: eu-central-1
   backendType: systemManager
   mapping:
     db-root-username: /dev/wordpress-1/DB/username
@@ -46,3 +47,6 @@ externalSecrets:
 
 hpa:
   engine: keda
+
+ingress:
+  enabled: true

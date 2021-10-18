@@ -12,13 +12,11 @@ spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "wordpress-bedrock.name" . }}
-      app.kubernetes.io/instance: {{ .Release.Name }}
+      {{- include "wordpress-bedrock.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "wordpress-bedrock.name" . }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
+        {{- include "wordpress-bedrock.selectorLabels" . | nindent 8 }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
         {{- if .Values.podAnnotations }}
