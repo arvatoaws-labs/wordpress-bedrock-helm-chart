@@ -70,6 +70,9 @@ nginx:
   cache_control:
     expires: max
     js_css_enabled: false
+  fastcgi_buffer_size: 16k
+  fastcgi_buffers_number: 16
+  fastcgi_buffers_size: 8k
   # this document will be attached to the nginx server block
   additional_config:
   securityContext:
