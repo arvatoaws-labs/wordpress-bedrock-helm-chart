@@ -50,3 +50,15 @@ hpa:
 
 ingress:
   enabled: true
+
+cron:
+  jobs:
+   - name: job1
+     schedule: "*/5 * * * *"
+     command: wp --version
+     concurrencyPolicy: Replace
+     restartPolicy: OnFailure
+     startingDeadlineSeconds: 1800
+   - name: job2
+     schedule: "* 16 * * 5"
+     command: /var/www/html/web/app/plugins/regular_task.sh
