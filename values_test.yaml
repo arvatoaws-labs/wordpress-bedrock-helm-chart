@@ -65,6 +65,6 @@ cron:
       schedule: "* 16 * * 5"
       command: /var/www/html/web/app/plugins/regular_task.sh
     job3:
-      enabled: true
+      enabled: false
       schedule: "* 15 * * 5"
       command: /scripts/to_something.sh

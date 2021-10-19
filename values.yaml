@@ -254,6 +254,13 @@ tolerations: []
 
 affinity: {}
 
-# this section allows to configure custom cron jobs
+# this section allows to configure cron jobs
 cron:
   jobs:
+    cron:
+      enabled: true
+      schedule: "*/5 * * * *"
+      command: /scripts/run-cron.sh
+      concurrencyPolicy: Replace
+      restartPolicy: OnFailure
+      startingDeadlineSeconds: 1800
