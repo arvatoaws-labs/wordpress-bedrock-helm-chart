@@ -256,4 +256,4 @@ affinity: {}
 
 # this section allows to configure custom cron jobs
 cron:
-  jobs: []
+  jobs:

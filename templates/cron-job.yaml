@@ -112,10 +112,11 @@ spec:
 ---
 {{- if $.Values.cron.jobs }}
 {{- range $cronkey, $cronvalue := $.Values.cron.jobs }}
+{{- if $cronvalue.enabled }}
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: {{ include "wordpress-bedrock.fullname" $ }}-{{ $cronvalue.name }}
+  name: {{ include "wordpress-bedrock.fullname" $ }}-{{ $cronkey }}
   labels:
 {{ include "wordpress-bedrock.labels" $ | indent 4 }}
   annotations:
@@ -226,5 +227,6 @@ spec:
               server: {{ $.Values.efs.fsid }}.efs.{{ $.Values.efs.awsRegion }}.amazonaws.com
 {{- end }}
 ---
+{{- end }}
 {{- end }}
 {{- end }}
