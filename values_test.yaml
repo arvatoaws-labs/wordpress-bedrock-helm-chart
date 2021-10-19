@@ -60,7 +60,7 @@ cron:
       concurrencyPolicy: Replace
       restartPolicy: OnFailure
       startingDeadlineSeconds: 1800
-    job2:
+    that-is-a-very-long-job-name:
       enabled: true
       schedule: "* 16 * * 5"
       command: /var/www/html/web/app/plugins/regular_task.sh

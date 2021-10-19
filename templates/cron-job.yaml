@@ -4,7 +4,8 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: {{ include "wordpress-bedrock.fullname" $ }}-{{ $cronkey }}
+  {{- $nameMaxLength := len $cronkey | sub 51 | int }}
+  name: {{ include "wordpress-bedrock.fullname" $ | trunc $nameMaxLength }}-{{ $cronkey }}
   labels:
 {{ include "wordpress-bedrock.labels" $ | indent 4 }}
   annotations:

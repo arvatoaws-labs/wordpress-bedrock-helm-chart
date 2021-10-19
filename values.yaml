@@ -257,7 +257,7 @@ affinity: {}
 # this section allows to configure cron jobs
 cron:
   jobs:
-    cron:
+    wp-cron:
       enabled: true
       schedule: "*/5 * * * *"
       command: /scripts/run-cron.sh
