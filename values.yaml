@@ -220,7 +220,7 @@ exporter:
   phpfpm:
     image:
       repository: hipages/php-fpm_exporter
-      tag: 1.0.0
+      tag: 1.2.1
       pullPolicy: IfNotPresent
     port: 9253
     metrics: /metrics
