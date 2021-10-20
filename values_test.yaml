@@ -50,6 +50,8 @@ hpa:
 
 ingress:
   enabled: true
+  hosts:
+  - host: www.example.com
 
 cron:
   jobs:
