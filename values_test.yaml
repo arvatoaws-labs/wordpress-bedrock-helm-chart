@@ -50,3 +50,8 @@ hpa:
 
 ingress:
   enabled: true
+  hosts:
+    - host: chart-test.local
+      paths:
+        - path: /*
+          pathType: ImplementationSpecific
