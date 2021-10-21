@@ -1,53 +1,59 @@
+{{- if $.Values.cron.jobs }}
+{{- range $cronkey, $cronvalue := $.Values.cron.jobs }}
+{{- if $cronvalue.enabled }}
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: {{ include "wordpress-bedrock.fullname" . }}-cron
+  {{- $nameMaxLength := len $cronkey | sub 51 | int }}
+  name: {{ include "wordpress-bedrock.fullname" $ | trunc $nameMaxLength }}-{{ $cronkey }}
   labels:
-{{ include "wordpress-bedrock.labels" . | indent 4 }}
+{{ include "wordpress-bedrock.labels" $ | indent 4 }}
   annotations:
-    {{- if .Values.wordpress.uptime }}
-    downscaler/uptime: {{.Values.wordpress.uptime}}
+    {{- if $.Values.wordpress.uptime }}
+    downscaler/uptime: {{ $.Values.wordpress.uptime }}
     {{- end }}
-    checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") $ | sha256sum }}
 spec:
-  schedule: "{{ .Values.wordpress.cron_schedule }}"
-  concurrencyPolicy: Replace
-  startingDeadlineSeconds: 1800
+  schedule: "{{ $cronvalue.schedule }}"
+  concurrencyPolicy: {{ $cronvalue.concurrencyPolicy | default "Forbid" }}
+  {{- if $cronvalue.startingDeadlineSeconds }}
+  startingDeadlineSeconds: {{ $cronvalue.startingDeadlineSeconds }}
+  {{- end }}
   jobTemplate:
     spec:
       template:
         metadata:
           labels:
-            app.kubernetes.io/name: {{ include "wordpress-bedrock.name" . }}-cron
-            app.kubernetes.io/instance: {{ .Release.Name }}
-          {{- if .Values.podLabels }}
+            app.kubernetes.io/name: {{ include "wordpress-bedrock.name" $ }}-cron
+            app.kubernetes.io/instance: {{ $.Release.Name }}
+          {{- if $.Values.podLabels }}
             ## Custom pod labels
-            {{- range $key, $value := .Values.podLabels }}
+            {{- range $key, $value := $.Values.podLabels }}
             {{ $key }}: {{ $value | quote }}
             {{- end }}
           {{- end }}
           annotations:
-            checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
-          {{- if .Values.podAnnotations }}
+            checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") $ | sha256sum }}
+          {{- if $.Values.podAnnotations }}
             ## Custom pod annotations
-            {{- range $key, $value := .Values.podAnnotations }}
+            {{- range $key, $value := $.Values.podAnnotations }}
             {{ $key }}: {{ $value | quote }}
             {{- end }}
           {{- end }}
         spec:
           priorityClassName: background
-          serviceAccountName: {{ template "wordpress-bedrock.serviceAccountName" . }}
+          serviceAccountName: {{ template "wordpress-bedrock.serviceAccountName" $ }}
           securityContext:
-            {{- toYaml .Values.podSecurityContext | nindent 12 }}
+            {{- toYaml $.Values.podSecurityContext | nindent 12 }}
           containers:
           - name: wordpress-cron
             securityContext:
-            {{- toYaml .Values.php.securityContext | nindent 14 }}
-            image: "{{ .Values.php.image.repository }}:{{ .Values.php.image.tag }}"
-            imagePullPolicy: {{ .Values.php.image.pullPolicy }}
+            {{- toYaml $.Values.php.securityContext | nindent 14 }}
+            image: "{{ $.Values.php.image.repository }}:{{ $.Values.php.image.tag }}"
+            imagePullPolicy: {{ $.Values.php.image.pullPolicy }}
             workingDir: /app
             command:
-            - /scripts/run-cron.sh
+            - {{ $cronvalue.command }}
             env:
             {{ if $.Values.offload.bucket }}
               - name: WP_OFFLOAD_BUCKET
@@ -65,7 +71,7 @@ spec:
                 value: {{ index $.Values.ingress.hosts 0 "host" | quote }}
               - name: WP_PLUGINS
                 value: {{ join " " $.Values.plugins | quote }}
-          {{- range $key, $value := .Values.externalSecrets.mapping }}
+          {{- range $key, $value := $.Values.externalSecrets.mapping }}
               {{ if not (contains "wordpress-" $key) }}
               {{ if not (contains "-root-" $key) }}
               - name: {{ $key | upper | replace "-" "_" }}
@@ -76,8 +82,8 @@ spec:
               {{- end }}
               {{- end }}
           {{- end }}
-      {{- if .Values.extraEnv }}
-{{ toYaml .Values.extraEnv | indent 14 }}
+      {{- if $.Values.extraEnv }}
+{{ toYaml $.Values.extraEnv | indent 14 }}
       {{- end }}
             volumeMounts:
             - mountPath: /usr/local/etc/php-fpm.conf
@@ -87,25 +93,29 @@ spec:
             - name: tmp-volume
               mountPath: /tmp
               readOnly: false
-{{- if .Values.efs.enabled }}
+{{- if $.Values.efs.enabled }}
             - name: efs
-              mountPath: /var/www/html/web/{{ .Values.efs.mountPath }}
+              mountPath: /var/www/html/web/{{ $.Values.efs.mountPath }}
               readOnly: false
 {{- end }}
             resources:
-              {{- toYaml .Values.php.resources | nindent 14 }}
-          restartPolicy: OnFailure
+              {{- toYaml $.Values.php.resources | nindent 14 }}
+          restartPolicy: {{ $cronvalue.restartPolicy | default "Never" }}
           volumes:
           - name: config-volume
             configMap:
               # Provide the name of the ConfigMap containing the files you want
               # to add to the container
-              name: {{ include "wordpress-bedrock.fullname" . }}
+              name: {{ include "wordpress-bedrock.fullname" $ }}
           - name: tmp-volume
             emptyDir: {}
-{{- if .Values.efs.enabled }}
+{{- if $.Values.efs.enabled }}
           - name: efs
             nfs:
-              path: /{{ .Values.efs.subPath }}
-              server: {{ .Values.efs.fsid }}.efs.{{ .Values.efs.awsRegion }}.amazonaws.com
+              path: /{{ $.Values.efs.subPath }}
+              server: {{ $.Values.efs.fsid }}.efs.{{ $.Values.efs.awsRegion }}.amazonaws.com
+{{- end }}
+---
+{{- end }}
+{{- end }}
 {{- end }}

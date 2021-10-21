@@ -40,3 +40,4 @@ Features
 * support for kube-downscaler (see wordpress uptime section in values.yaml)
 * support for shared nfs volumes using EFS (see example in values_test.yaml)
 * support for custom volumes mounts (see example in values_test.yaml)
+* support for custom cron jobs (see example in values_test.yaml)
