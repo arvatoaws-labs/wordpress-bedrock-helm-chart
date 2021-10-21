@@ -4,10 +4,7 @@ kind: Job
 metadata:
   name: {{ $.Release.Name }}-pre-install-setup-efs-hook
   labels:
-    app.kubernetes.io/name: {{ $.Release.Name }}
-    #helm.sh/chart: {{ $.Release.Chart }}
-    app.kubernetes.io/instance: {{ $.Release.Name }}
-    app.kubernetes.io/managed-by: {{ $.Release.Service }}
+{{ include "wordpress-bedrock.labels" . | indent 4 }}
   annotations:
     # This is what defines this resource as a hook. Without this line, the
     # job is considered part of the release.
