@@ -144,8 +144,6 @@ plugins:
 wordpress:
   # sample setting for office hours would be "Mon-Fri 07:30-18:30 Europe/Berlin"
   uptime:
-  # sample setting for office hours would be "*/5 8-18 * * 1-5"
-  cron_schedule: "*/5 * * * *"
 
 # this sections allows to configure different hooks at different stages of the helm deployment
 hooks:
