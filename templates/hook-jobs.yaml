@@ -19,6 +19,10 @@ spec:
   ttlSecondsAfterFinished: 600
   template:
     spec:
+    {{- with $.Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
       containers:
       - name: job-done
         image: public.ecr.aws/runecast/busybox:1.33.1
