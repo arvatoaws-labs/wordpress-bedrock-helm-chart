@@ -59,7 +59,7 @@ spec:
             command:
             - {{ $cronvalue.command }}
             env:
-            {{ if $.Values.offload.bucket }}
+            {{- if $.Values.offload.bucket }}
               - name: WP_OFFLOAD_BUCKET
                 value: {{ $.Values.offload.bucket | quote }}
               - name: WP_OFFLOAD_REGION
@@ -76,8 +76,8 @@ spec:
               - name: WP_PLUGINS
                 value: {{ join " " $.Values.plugins | quote }}
           {{- range $key, $value := $.Values.externalSecrets.mapping }}
-              {{ if not (contains "wordpress-" $key) }}
-              {{ if not (contains "-root-" $key) }}
+              {{- if not (contains "wordpress-" $key) }}
+              {{- if not (contains "-root-" $key) }}
               - name: {{ $key | upper | replace "-" "_" }}
                 valueFrom:
                   secretKeyRef:

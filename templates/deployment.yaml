@@ -127,7 +127,7 @@ spec:
                   - -c
                   - "sleep 30"
           env:
-          {{ if $.Values.offload.bucket }}
+          {{- if $.Values.offload.bucket }}
             - name: WP_OFFLOAD_BUCKET
               value: {{ $.Values.offload.bucket | quote }}
             - name: WP_OFFLOAD_REGION
@@ -144,8 +144,8 @@ spec:
             - name: WP_PLUGINS
               value: {{ join " " $.Values.plugins | quote }}
         {{- range $key, $value := .Values.externalSecrets.mapping }}
-            {{ if not (contains "wordpress-" $key) }}
-            {{ if not (contains "-root-" $key) }}
+            {{- if not (contains "wordpress-" $key) }}
+            {{- if not (contains "-root-" $key) }}
             - name: {{ $key | upper | replace "-" "_" }}
               valueFrom:
                 secretKeyRef:
@@ -218,7 +218,7 @@ spec:
               port: nginx-metrics
           resources:
 {{ toYaml .Values.exporter.nginx.resources | indent 12 }}
-{{ end }}
+{{- end }}
       volumes:
       - name: config-volume
         configMap:
@@ -236,7 +236,7 @@ spec:
       - name: uploads-volume
         emptyDir: {}
 {{- range $key, $value := .Values.php.extraVolumeMounts }}
-{{ if not (contains "efs" $value.name ) }}
+{{- if not (contains "efs" $value.name ) }}
       - name: {{ $value.name }}
         emptyDir: {}
 {{- end }}

@@ -37,7 +37,7 @@ spec:
         command:
         - /scripts/{{ $hookname }}.sh
         env:
-        {{ if $.Values.offload.bucket }}
+        {{- if $.Values.offload.bucket }}
         - name: WP_OFFLOAD_BUCKET
           value: {{ $.Values.offload.bucket | quote }}
         - name: WP_OFFLOAD_REGION
