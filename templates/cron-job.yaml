@@ -90,9 +90,9 @@ spec:
 {{ toYaml $.Values.extraEnv | indent 14 }}
       {{- end }}
             volumeMounts:
-            - mountPath: /usr/local/etc/php-fpm.conf
+            - mountPath: /usr/local/etc/php/conf.d/cron.ini
               name: config-volume
-              subPath: php-fpm.conf
+              subPath: {{ $cronkey }}.ini
               readOnly: true
             - name: tmp-volume
               mountPath: /tmp
@@ -103,7 +103,11 @@ spec:
               readOnly: false
 {{- end }}
             resources:
-              {{- toYaml $.Values.php.resources | nindent 14 }}
+              {{- if $cronvalue.resources }}
+              {{- toYaml $cronvalue.resources | nindent 14 }}
+              {{- else }}
+              {{- toYaml $.Values.cron.jobs.resources | nindent 14 }}
+              {{- end }}
           restartPolicy: {{ $cronvalue.restartPolicy | default "Never" }}
           volumes:
           - name: config-volume

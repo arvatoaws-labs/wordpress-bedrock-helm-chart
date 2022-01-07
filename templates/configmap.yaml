@@ -11,6 +11,23 @@ metadata:
     "helm.sh/hook": pre-install,pre-upgrade
     "helm.sh/hook-delete-policy": before-hook-creation
 data:
+{{- if $.Values.cron.jobs }}
+{{- range $cronkey, $cronvalue := $.Values.cron.jobs }}
+{{- if $cronvalue.enabled }}
+  {{ $cronkey }}.ini: |-
+    [PHP]
+    {{- if $cronvalue.php }}
+    {{- range $key, $value := $cronvalue.php }}
+    {{ $key }} = {{ $value }}
+    {{- end }}
+    {{- else }}
+    {{- range $key, $value := $.Values.cron.php }}
+    {{ $key }} = {{ $value }}
+    {{- end }}
+    {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
   php-fpm.conf: |-
     [global]
 

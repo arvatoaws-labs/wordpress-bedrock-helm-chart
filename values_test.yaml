@@ -54,6 +54,14 @@ ingress:
   - host: www.example.com
 
 cron:
+  resources:
+    limits:
+      memory: 512Mi
+    requests:
+      cpu: 50m
+      memory: 128Mi
+  php:
+    memory_limit: 128M
   jobs:
     job1:
       enabled: true
@@ -66,6 +74,14 @@ cron:
       enabled: true
       schedule: "* 16 * * 5"
       command: /var/www/html/web/app/plugins/regular_task.sh
+      resources:
+        limits:
+          memory: 2048Mi
+        requests:
+          cpu: 100m
+          memory: 512Mi
+      php:
+        memory_limit: 512M
     job3:
       enabled: false
       schedule: "* 15 * * 5"
