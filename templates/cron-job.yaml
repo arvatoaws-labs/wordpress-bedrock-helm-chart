@@ -106,7 +106,7 @@ spec:
               {{- if $cronvalue.resources }}
               {{- toYaml $cronvalue.resources | nindent 14 }}
               {{- else }}
-              {{- toYaml $.Values.cron.jobs.resources | nindent 14 }}
+              {{- toYaml $.Values.cron.resources | nindent 14 }}
               {{- end }}
           restartPolicy: {{ $cronvalue.restartPolicy | default "Never" }}
           volumes:
