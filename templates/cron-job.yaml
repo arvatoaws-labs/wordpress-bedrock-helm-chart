@@ -59,7 +59,7 @@ spec:
             command:
             - {{ $cronvalue.command }}
             env:
-            {{ if $.Values.offload.bucket }}
+            {{- if $.Values.offload.bucket }}
               - name: WP_OFFLOAD_BUCKET
                 value: {{ $.Values.offload.bucket | quote }}
               - name: WP_OFFLOAD_REGION
@@ -76,8 +76,8 @@ spec:
               - name: WP_PLUGINS
                 value: {{ join " " $.Values.plugins | quote }}
           {{- range $key, $value := $.Values.externalSecrets.mapping }}
-              {{ if not (contains "wordpress-" $key) }}
-              {{ if not (contains "-root-" $key) }}
+              {{- if not (contains "wordpress-" $key) }}
+              {{- if not (contains "-root-" $key) }}
               - name: {{ $key | upper | replace "-" "_" }}
                 valueFrom:
                   secretKeyRef:
@@ -90,9 +90,9 @@ spec:
 {{ toYaml $.Values.extraEnv | indent 14 }}
       {{- end }}
             volumeMounts:
-            - mountPath: /usr/local/etc/php-fpm.conf
+            - mountPath: /usr/local/etc/php/conf.d/cron.ini
               name: config-volume
-              subPath: php-fpm.conf
+              subPath: {{ $cronkey }}.ini
               readOnly: true
             - name: tmp-volume
               mountPath: /tmp
@@ -103,7 +103,11 @@ spec:
               readOnly: false
 {{- end }}
             resources:
-              {{- toYaml $.Values.php.resources | nindent 14 }}
+              {{- if $cronvalue.resources }}
+              {{- toYaml $cronvalue.resources | nindent 14 }}
+              {{- else }}
+              {{- toYaml $.Values.cron.resources | nindent 14 }}
+              {{- end }}
           restartPolicy: {{ $cronvalue.restartPolicy | default "Never" }}
           volumes:
           - name: config-volume

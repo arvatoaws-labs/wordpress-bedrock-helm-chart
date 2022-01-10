@@ -254,6 +254,15 @@ affinity: {}
 
 # this section allows to configure cron jobs
 cron:
+  # this resources and php defaults will be applied if not get overwritten in the specific job
+  resources:
+    limits:
+      memory: 512Mi
+    requests:
+      cpu: 50m
+      memory: 128Mi
+  php:
+    memory_limit: 128M
   jobs:
     wp-cron:
       enabled: true
@@ -262,3 +271,4 @@ cron:
       concurrencyPolicy: Replace
       restartPolicy: OnFailure
       startingDeadlineSeconds: 1800
+      
