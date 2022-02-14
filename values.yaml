@@ -196,7 +196,7 @@ exporter:
   nginx:
     image:
       repository: nginx/nginx-prometheus-exporter
-      tag: 0.9.0
+      tag: 0.10.0
       pullPolicy: IfNotPresent
     port: 9113
     telemetry_path: /metrics
