@@ -89,7 +89,7 @@ nginx:
 
 php:
   image:
-    repository: php
+    repository: ghcr.io/arvatoaws-labs/php
     tag: fpm
     pullPolicy: IfNotPresent
   resources: {}
@@ -195,7 +195,7 @@ monitoring:
 exporter:
   nginx:
     image:
-      repository: nginx/nginx-prometheus-exporter
+      repository: ghcr.io/arvatoaws-labs/nginx-exporter
       tag: 0.10.0
       pullPolicy: IfNotPresent
     port: 9113
@@ -217,7 +217,7 @@ exporter:
 
   phpfpm:
     image:
-      repository: hipages/php-fpm_exporter
+      repository: ghcr.io/arvatoaws-labs/hipages/php-fpm_exporter
       tag: 2.0.4
       pullPolicy: IfNotPresent
     port: 9253
