@@ -1,9 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "wordpress-bedrock.fullname" . }}
+  name: {{ include "wordpress-bedrock.fullname" . }}-worker
   labels:
 {{ include "wordpress-bedrock.labels" . | indent 4 }}
+    app.kubernetes.io/component: "worker"
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -22,5 +23,5 @@ spec:
       name: php-fpm-metrics
 {{ end }}
   selector:
-    app.kubernetes.io/name: {{ include "wordpress-bedrock.name" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
+    {{- include "wordpress-bedrock.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: "worker"

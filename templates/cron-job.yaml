@@ -1,7 +1,7 @@
 {{- if $.Values.cron.jobs }}
 {{- range $cronkey, $cronvalue := $.Values.cron.jobs }}
 {{- if $cronvalue.enabled }}
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   {{- $nameMaxLength := len $cronkey | sub 51 | int }}
@@ -24,21 +24,15 @@ spec:
       template:
         metadata:
           labels:
-            app.kubernetes.io/name: {{ include "wordpress-bedrock.name" $ }}-cron
-            app.kubernetes.io/instance: {{ $.Release.Name }}
-          {{- if $.Values.podLabels }}
-            ## Custom pod labels
-            {{- range $key, $value := $.Values.podLabels }}
-            {{ $key }}: {{ $value | quote }}
-            {{- end }}
+            {{- include "wordpress-bedrock.selectorLabels" $ | nindent 12 }}
+            app.kubernetes.io/component: "cronjob"
+          {{- with $.Values.podLabels }}
+            {{- toYaml . | nindent 12 }}
           {{- end }}
           annotations:
             checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") $ | sha256sum }}
-          {{- if $.Values.podAnnotations }}
-            ## Custom pod annotations
-            {{- range $key, $value := $.Values.podAnnotations }}
-            {{ $key }}: {{ $value | quote }}
-            {{- end }}
+          {{- with $.Values.podAnnotations }}
+            {{- toYaml . | nindent 12 }}
           {{- end }}
         spec:
         {{- with $.Values.imagePullSecrets }}

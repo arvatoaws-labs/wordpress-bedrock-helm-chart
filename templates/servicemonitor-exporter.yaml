@@ -1,0 +1,28 @@
+{{- if and ( .Values.monitoring.serviceMonitor.enabled ) ( .Values.monitoring.enabled ) }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+{{- if .Values.monitoring.serviceMonitor.labels }}
+  labels:
+{{ toYaml .Values.monitoring.serviceMonitor.labels | indent 4}}
+{{- end }}
+  name: {{ template "wordpress-bedrock.fullname" . }}-wordpress-exporter
+{{- if .Values.monitoring.serviceMonitor.namespace }}
+  namespace: {{ .Values.monitoring.serviceMonitor.namespace }}
+{{- end }}
+spec:
+  endpoints:
+  - targetPort: metrics
+    path: /metrics
+{{- if .Values.monitoring.serviceMonitor.interval }}
+    interval: {{ .Values.monitoring.serviceMonitor.interval }}
+{{- end }}
+  jobLabel: {{ template "wordpress-bedrock.fullname" . }}-wordpress-exporter
+  namespaceSelector:
+    matchNames:
+    - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      {{- include "wordpress-bedrock.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: "exporter"
+{{- end }}

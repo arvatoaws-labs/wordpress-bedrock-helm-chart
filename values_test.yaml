@@ -44,6 +44,11 @@ externalSecrets:
     db-password: /dev/exampleblog/DB/password
     wordpress-username: /dev/exampleblog/wordpress/username
     wordpress-password: /dev/exampleblog/wordpress/password
+    testzeugs: /dev/exampleblog/wordpress/testzeugs
+
+extraEnv:
+  - name: DB_NAME
+    value: bedrocksample
 
 hpa:
   engine: keda
@@ -86,3 +91,11 @@ cron:
       enabled: false
       schedule: "* 15 * * 5"
       command: /scripts/to_something.sh
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: test-project
+  iamRoleArn: arn:aws:iam::123456789012:role/test-project-role

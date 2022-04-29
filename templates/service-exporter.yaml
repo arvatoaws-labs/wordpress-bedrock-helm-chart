@@ -1,0 +1,19 @@
+{{- if .Values.monitoring.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "wordpress-bedrock.fullname" . }}-exporter
+  labels:
+{{ include "wordpress-bedrock.labels" . | indent 4 }}
+    app.kubernetes.io/component: "exporter"
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+  selector:
+    {{- include "wordpress-bedrock.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: "exporter"
+{{- end }}

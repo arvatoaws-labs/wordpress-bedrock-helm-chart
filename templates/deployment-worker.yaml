@@ -1,9 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "wordpress-bedrock.fullname" . }}
+  name: {{ include "wordpress-bedrock.fullname" . }}-worker
   labels:
 {{ include "wordpress-bedrock.labels" . | indent 4 }}
+    app.kubernetes.io/component: "worker"
   annotations:
     {{- if .Values.wordpress.uptime }}
     downscaler/uptime: {{.Values.wordpress.uptime}}
@@ -13,19 +14,21 @@ spec:
   selector:
     matchLabels:
       {{- include "wordpress-bedrock.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: "worker"
   template:
     metadata:
       labels:
         {{- include "wordpress-bedrock.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: "worker"
+      {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
         checksum/secret: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
-        {{- if .Values.podAnnotations }}
-        ## Custom pod annotations
-        {{- range $key, $value := .Values.podAnnotations }}
-        {{ $key }}: {{ $value | quote }}
-        {{- end }}
-        {{- end }}
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:

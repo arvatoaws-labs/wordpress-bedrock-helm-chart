@@ -5,10 +5,8 @@ kind: Job
 metadata:
   name: {{ $.Release.Name }}-{{ $hooktype }}-hook
   labels:
-    app.kubernetes.io/name: {{ $.Release.Name }}
-    #helm.sh/chart: {{ $.Release.Chart }}
-    app.kubernetes.io/instance: {{ $.Release.Name }}
-    app.kubernetes.io/managed-by: {{ $.Release.Service }}
+{{ include "wordpress-bedrock.labels" $ | indent 4 }}
+    app.kubernetes.io/component: "hook"
   annotations:
     # This is what defines this resource as a hook. Without this line, the
     # job is considered part of the release.
@@ -18,6 +16,17 @@ metadata:
 spec:
   ttlSecondsAfterFinished: 600
   template:
+    metadata:
+      labels:
+        {{- include "wordpress-bedrock.selectorLabels" $ | nindent 8 }}
+        app.kubernetes.io/component: "hook"
+      {{- with $.Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      annotations:
+      {{- with $.Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
     {{- with $.Values.imagePullSecrets }}
       imagePullSecrets:
@@ -25,6 +34,17 @@ spec:
     {{- end }}
       containers:
       - name: job-done
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 65534
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
         image: public.ecr.aws/runecast/busybox:1.33.1
         command: ['sh', '-c', 'echo "all jobs completed"']
       initContainers:

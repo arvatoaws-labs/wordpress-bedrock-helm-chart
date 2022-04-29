@@ -1,0 +1,87 @@
+{{- if .Values.monitoring.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "wordpress-bedrock.fullname" . }}-exporter
+  labels:
+{{ include "wordpress-bedrock.labels" . | indent 4 }}
+    app.kubernetes.io/component: "exporter"
+  annotations:
+    {{- if .Values.wordpress.uptime }}
+    downscaler/uptime: {{.Values.wordpress.uptime}}
+    {{- end }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "wordpress-bedrock.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: "exporter"
+  template:
+    metadata:
+      labels:
+        {{- include "wordpress-bedrock.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: "exporter"
+      {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      annotations:
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      serviceAccountName: {{ template "wordpress-bedrock.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}-wordpress-monitor
+          securityContext:
+            {{- toYaml .Values.exporter.wordpress.securityContext | nindent 12 }}
+          image: "{{ .Values.exporter.wordpress.image.repository }}:{{ .Values.exporter.wordpress.image.tag }}"
+          imagePullPolicy: {{ .Values.exporter.wordpress.image.pullPolicy }}
+          env:
+          - name: WORDPRESS_TABLE_PREFIX
+            value: "wp_"
+      {{- range $key, $value := .Values.externalSecrets.mapping }}
+          {{- if (contains "db-" $key) }}
+          {{- if not (contains "-root-" $key) }}
+          - name: WORDPRESS_{{ $key | upper | replace "-" "_" | replace "USERNAME" "USER" }}
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "wordpress-bedrock.fullname" $ }}
+                key: {{ $key }}
+          {{- end }}
+          {{- end }}
+      {{- end }}
+      {{- range .Values.extraEnv }}
+          {{- if (contains "DB" .name) }}
+          - name: WORDPRESS_{{ .name }}
+            value: {{ .value }}
+          {{- end }}
+      {{- end }}
+          ports:
+            - name: metrics
+              containerPort: {{ .Values.exporter.wordpress.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+          resources:
+{{ toYaml .Values.exporter.wordpress.resources | indent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+{{- end }}

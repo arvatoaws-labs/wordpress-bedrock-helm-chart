@@ -14,6 +14,10 @@ serviceAccount:
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name:
+  #iamRoleArn:
+
+podAnnotations: {}
+podLabels: {}
 
 podSecurityContext:
   fsGroup: 2000
@@ -234,6 +238,22 @@ exporter:
       runAsNonRoot: true
       runAsUser: 65534
 
+  wordpress:
+    image:
+      repository: ghcr.io/arvatoaws-labs/wordpress_exporter
+      tag: latest
+      pullPolicy: IfNotPresent
+    port: 9850
+    metrics: /metrics
+    resources: {}
+    securityContext:
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 65534
+
 hpa:
   enabled: true
   engine: keda # prometheus-adapter
@@ -271,4 +291,3 @@ cron:
       concurrencyPolicy: Replace
       restartPolicy: OnFailure
       startingDeadlineSeconds: 1800
-      

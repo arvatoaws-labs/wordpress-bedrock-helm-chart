@@ -6,7 +6,7 @@ metadata:
   labels:
 {{ toYaml .Values.monitoring.serviceMonitor.labels | indent 4}}
 {{- end }}
-  name: {{ template "wordpress-bedrock.fullname" . }}-prometheus-exporter
+  name: {{ template "wordpress-bedrock.fullname" . }}-worker-exporter
 {{- if .Values.monitoring.serviceMonitor.namespace }}
   namespace: {{ .Values.monitoring.serviceMonitor.namespace }}
 {{- end }}
@@ -22,12 +22,12 @@ spec:
 {{- if .Values.monitoring.serviceMonitor.interval }}
     interval: {{ .Values.monitoring.serviceMonitor.interval }}
 {{- end }}
-  jobLabel: {{ template "wordpress-bedrock.fullname" . }}-prometheus-exporter
+  jobLabel: {{ template "wordpress-bedrock.fullname" . }}-worker-exporter
   namespaceSelector:
     matchNames:
     - {{ .Release.Namespace }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "wordpress-bedrock.name" . }}
-      app.kubernetes.io/instance: {{ .Release.Name }}
+      {{- include "wordpress-bedrock.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: "worker"
 {{- end }}
