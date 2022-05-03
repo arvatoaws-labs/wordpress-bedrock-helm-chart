@@ -1,4 +1,4 @@
-{{- if and ( .Values.monitoring.serviceMonitor.enabled ) ( .Values.monitoring.enabled ) }}
+{{- if and ( .Values.exporter.wordpress.enabled ) ( .Values.monitoring.enabled ) }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:

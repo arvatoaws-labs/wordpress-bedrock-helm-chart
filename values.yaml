@@ -239,6 +239,7 @@ exporter:
       runAsUser: 65534
 
   wordpress:
+    enabled: false
     image:
       repository: ghcr.io/arvatoaws-labs/wordpress_exporter
       tag: latest
