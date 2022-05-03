@@ -55,9 +55,9 @@ Create the name of the service account to use
 */}}
 {{- define "wordpress-bedrock.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "wordpress-bedrock.fullname" .) .Values.serviceAccount.name }}
+{{- default .Release.Name .Values.serviceAccount.name }}
 {{- else }}
-{{- default "default" .Values.serviceAccount.name }}
+{{- "default" }}
 {{- end }}
 {{- end }}
 
