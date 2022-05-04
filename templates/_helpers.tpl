@@ -57,7 +57,7 @@ Create the name of the service account to use
 {{- if .Values.serviceAccount.create }}
 {{- default .Release.Name .Values.serviceAccount.name }}
 {{- else }}
-{{- "default" }}
+{{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
 
