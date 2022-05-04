@@ -96,6 +96,6 @@ serviceAccount:
   # Specifies whether a service account should be created
   create: true
   # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
+  # If not set and create is true, a name is generated using the release name
   name: test-project
   iamRoleArn: arn:aws:iam::123456789012:role/test-project-role
