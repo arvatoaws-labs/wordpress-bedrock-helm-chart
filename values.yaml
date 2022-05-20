@@ -222,7 +222,7 @@ exporter:
   phpfpm:
     image:
       repository: ghcr.io/arvatoaws-labs/hipages/php-fpm_exporter
-      tag: 2.0.4
+      tag: 2.2.0
       pullPolicy: IfNotPresent
     port: 9253
     metrics: /metrics
