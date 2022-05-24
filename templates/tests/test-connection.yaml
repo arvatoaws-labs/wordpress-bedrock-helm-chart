@@ -9,9 +9,9 @@ metadata:
 spec:
   containers:
     - name: wget
-      image: busybox
+      image: public.ecr.aws/runecast/busybox:1.33.1
       command: ['wget']
-      args:  ['{{ include "wordpress-bedrock.fullname" . }}-worker:{{ .Values.service.port }}']
+      args:  ['{{ include "wordpress-bedrock.fullname" . }}-worker:{{ .Values.service.port }}/wp/wp-login.php']
       resources:
         requests:
           cpu: 0.01
