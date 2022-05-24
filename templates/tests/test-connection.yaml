@@ -11,9 +11,16 @@ spec:
     - name: wget
       image: public.ecr.aws/runecast/busybox:1.33.1
       command: ['wget']
-      args:  ['{{ include "wordpress-bedrock.fullname" . }}-worker:{{ .Values.service.port }}/wp/wp-login.php']
+      args:  ['--spider', '{{ include "wordpress-bedrock.fullname" . }}-worker:{{ .Values.service.port }}/wp/wp-login.php']
       resources:
         requests:
           cpu: 0.01
           memory: 32Mi
+      securityContext:
+        capabilities:
+          drop:
+          - ALL
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        runAsUser: 65534
   restartPolicy: Never
