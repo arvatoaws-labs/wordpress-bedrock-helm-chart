@@ -200,7 +200,7 @@ exporter:
   nginx:
     image:
       repository: ghcr.io/arvatoaws-labs/nginx-exporter
-      tag: 0.10.0
+      tag: 0.11.0
       pullPolicy: IfNotPresent
     port: 9113
     telemetry_path: /metrics
