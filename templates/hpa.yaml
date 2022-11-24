@@ -1,6 +1,6 @@
 {{- if .Values.hpa.enabled }}
 {{- if eq .Values.hpa.engine "prometheus-adapter" }}
-apiVersion: autoscaling/v2beta2
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ include "wordpress-bedrock.fullname" . }}
