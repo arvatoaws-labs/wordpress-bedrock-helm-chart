@@ -48,6 +48,10 @@ metadata:
   name: {{ include "wordpress-bedrock.fullname" . }}
   labels:
 {{ include "wordpress-bedrock.labels" . | indent 4 }}
+  annotations:
+    {{- if .Values.wordpress.uptime }}
+    downscaler/uptime: {{.Values.wordpress.uptime}}
+    {{- end }}
 spec:
   scaleTargetRef:
     name: {{ include "wordpress-bedrock.fullname" . }}-worker
