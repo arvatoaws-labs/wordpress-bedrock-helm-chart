@@ -74,6 +74,7 @@ cron:
       command: wp --version
       concurrencyPolicy: Replace
       restartPolicy: OnFailure
+      backoffLimit: 2
       startingDeadlineSeconds: 1800
     that-is-a-very-long-job-name:
       enabled: true

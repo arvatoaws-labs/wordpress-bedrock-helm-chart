@@ -25,6 +25,7 @@ spec:
   {{- end }}
   jobTemplate:
     spec:
+      backoffLimit: {{ $cronvalue.backoffLimit | default 0 }}
       template:
         metadata:
           labels:
