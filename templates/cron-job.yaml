@@ -17,6 +17,7 @@ metadata:
     downscaler/uptime: {{ $.Values.wordpress.uptime }}
     {{- end }}
     checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") $ | sha256sum }}
+    karpenter.sh/do-not-evict: true
 spec:
   schedule: "{{ $cronvalue.schedule }}"
   concurrencyPolicy: {{ $cronvalue.concurrencyPolicy | default "Forbid" }}
@@ -108,6 +109,18 @@ spec:
               {{- toYaml $.Values.cron.resources | nindent 14 }}
               {{- end }}
           restartPolicy: {{ $cronvalue.restartPolicy | default "Never" }}
+          nodeSelector:
+            {{- if $cronvalue.nodeSelector }}
+            {{- toYaml $cronvalue.nodeSelector | nindent 12 }}
+            {{- else }}
+            {{- toYaml $.Values.cron.nodeSelector | nindent 12 }}
+            {{- end }}
+          tolerations:
+            {{- if $cronvalue.tolerations }}
+            {{- toYaml $cronvalue.tolerations | nindent 12 }}
+            {{- else }}
+            {{- toYaml $.Values.cron.tolerations | nindent 12 }}
+            {{- end }}
           volumes:
           - name: config-volume
             configMap:

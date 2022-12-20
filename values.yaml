@@ -282,6 +282,8 @@ cron:
     requests:
       cpu: 50m
       memory: 128Mi
+  nodeSelector: {}
+  tolerations: []
   php:
     memory_limit: 128M
   jobs:

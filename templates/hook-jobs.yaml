@@ -27,6 +27,7 @@ spec:
       {{- with $.Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
+        karpenter.sh/do-not-evict: true
     spec:
     {{- with $.Values.imagePullSecrets }}
       imagePullSecrets:
