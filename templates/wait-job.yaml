@@ -14,10 +14,10 @@ metadata:
 spec:
   ttlSecondsAfterFinished: 600
   template:
+    metadata:
+      annotations:
+        karpenter.sh/do-not-evict: "true"
     spec:
-      metadata:
-        annotations:
-          karpenter.sh/do-not-evict: "true"
       containers:
       - name: job-done
         securityContext:
