@@ -15,6 +15,9 @@ spec:
   ttlSecondsAfterFinished: 600
   template:
     spec:
+      metadata:
+        annotations:
+          karpenter.sh/do-not-evict: "true"
       containers:
       - name: setup-efs-base
         securityContext:
