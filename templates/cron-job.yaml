@@ -17,7 +17,6 @@ metadata:
     downscaler/uptime: {{ $.Values.wordpress.uptime }}
     {{- end }}
     checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") $ | sha256sum }}
-    karpenter.sh/do-not-evict: "true"
 spec:
   schedule: "{{ $cronvalue.schedule }}"
   concurrencyPolicy: {{ $cronvalue.concurrencyPolicy | default "Forbid" }}
@@ -40,6 +39,7 @@ spec:
           {{- with $.Values.podAnnotations }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
+            karpenter.sh/do-not-evict: "true"
         spec:
         {{- with $.Values.imagePullSecrets }}
           imagePullSecrets:
