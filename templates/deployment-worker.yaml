@@ -130,6 +130,11 @@ spec:
                   - -c
                   - "sleep 30"
           env:
+            - name: AWS_ZONE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.labels['topology.kubernetes.io/zone']
           {{- if $.Values.offload.bucket }}
             - name: WP_OFFLOAD_BUCKET
               value: {{ $.Values.offload.bucket | quote }}
