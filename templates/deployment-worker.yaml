@@ -102,9 +102,9 @@ spec:
           image: "{{ .Values.php.image.repository }}:{{ .Values.php.image.tag }}"
           imagePullPolicy: {{ .Values.php.image.pullPolicy }}
           ports:
-            - name: fpm
-              containerPort: 9000
-              protocol: TCP
+          - name: fpm
+            containerPort: 9000
+            protocol: TCP
           volumeMounts:
           - mountPath: /usr/local/etc/php-fpm.conf
             name: config-volume
@@ -130,35 +130,35 @@ spec:
                   - -c
                   - "sleep 30"
           env:
-            - name: AWS_ZONE
-              valueFrom:
-                fieldRef:
-                  apiVersion: v1
-                  fieldPath: metadata.labels['topology.kubernetes.io/zone']
+          - name: AWS_ZONE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.labels['topology.kubernetes.io/zone']
           {{- if $.Values.offload.bucket }}
-            - name: WP_OFFLOAD_BUCKET
-              value: {{ $.Values.offload.bucket | quote }}
-            - name: WP_OFFLOAD_REGION
-              value: {{ $.Values.offload.region | quote }}
-            - name: WP_OFFLOAD_DOMAIN
-              value: {{ $.Values.offload.domain | quote }}
-            - name: WP_OFFLOAD_CLOUDFRONT
-              value: {{ $.Values.offload.cloudfront | quote }}
-            - name: WP_OFFLOAD_LOCAL_DOMAINS
-              value: {{ $.Values.offload.local_domains | quote }}
+          - name: WP_OFFLOAD_BUCKET
+            value: {{ $.Values.offload.bucket | quote }}
+          - name: WP_OFFLOAD_REGION
+            value: {{ $.Values.offload.region | quote }}
+          - name: WP_OFFLOAD_DOMAIN
+            value: {{ $.Values.offload.domain | quote }}
+          - name: WP_OFFLOAD_CLOUDFRONT
+            value: {{ $.Values.offload.cloudfront | quote }}
+          - name: WP_OFFLOAD_LOCAL_DOMAINS
+            value: {{ $.Values.offload.local_domains | quote }}
           {{- end }}
-            - name: WP_DEFAULT_HOST
-              value: {{ index $.Values.ingress.hosts 0 "host" | quote }}
-            - name: WP_PLUGINS
-              value: {{ join " " $.Values.plugins | quote }}
+          - name: WP_DEFAULT_HOST
+            value: {{ index $.Values.ingress.hosts 0 "host" | quote }}
+          - name: WP_PLUGINS
+            value: {{ join " " $.Values.plugins | quote }}
         {{- range $key, $value := .Values.externalSecrets.mapping }}
             {{- if not (contains "wordpress-" $key) }}
             {{- if not (contains "-root-" $key) }}
-            - name: {{ $key | upper | replace "-" "_" }}
-              valueFrom:
-                secretKeyRef:
-                  name: {{ template "wordpress-bedrock.fullname" $ }}
-                  key: {{ $key }}
+          - name: {{ $key | upper | replace "-" "_" }}
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "wordpress-bedrock.fullname" $ }}
+                key: {{ $key }}
             {{- end }}
             {{- end }}
         {{- end }}
