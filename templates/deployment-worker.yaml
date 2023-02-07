@@ -151,7 +151,7 @@ spec:
             value: {{ index $.Values.ingress.hosts 0 "host" | quote }}
           - name: WP_PLUGINS
             value: {{ join " " $.Values.plugins | quote }}
-        {{- range $key, $value := .Values.externalSecrets.mapping }}
+          {{- range $key, $value := .Values.externalSecrets.mapping }}
             {{- if not (contains "wordpress-" $key) }}
             {{- if not (contains "-root-" $key) }}
           - name: {{ $key | upper | replace "-" "_" }}
@@ -161,9 +161,9 @@ spec:
                 key: {{ $key }}
             {{- end }}
             {{- end }}
-        {{- end }}
+          {{- end }}
       {{- if .Values.extraEnv }}
-{{ toYaml .Values.extraEnv | indent 12 }}
+{{ toYaml .Values.extraEnv | indent 10 }}
       {{- end }}
           resources:
             {{- toYaml .Values.php.resources | nindent 12 }}
