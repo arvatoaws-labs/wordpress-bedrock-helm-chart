@@ -107,7 +107,7 @@ spec:
           # Provide the name of the ConfigMap containing the files you want
           # to add to the container
           name: {{ template "wordpress-bedrock.fullname" $ }}
-  backoffLimit: 4
+  backoffLimit: 1
 ---
 {{- end }}
 {{- end }}
