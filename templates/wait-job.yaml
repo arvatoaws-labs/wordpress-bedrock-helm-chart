@@ -10,7 +10,7 @@ metadata:
     # job is considered part of the release.
     "helm.sh/hook-weight": "1"
     "helm.sh/hook": pre-install
-    "helm.sh/hook-delete-policy": hook-succeeded,before-hook-creation
+    "helm.sh/hook-delete-policy": before-hook-creation
 spec:
   ttlSecondsAfterFinished: 600
   template:
