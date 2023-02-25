@@ -18,7 +18,15 @@ metadata:
     {{- end }}
     checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") $ | sha256sum }}
 spec:
-  schedule: "{{ $cronvalue.schedule }}"
+  {{- $scheduleEveryXMin := dig "scheduleEveryXMin" "" $cronvalue }}
+  {{- $schedule := dig "schedule" "" $cronvalue }}
+  {{- if $schedule }}
+  schedule: "{{ $schedule }}"
+  {{- else if $scheduleEveryXMin }}
+  {{- if ( eq ( mod 30 $scheduleEveryXMin ) 0 ) }}
+  schedule: "{{ mod ( randNumeric 2 | atoi ) $scheduleEveryXMin }}-59/{{ $scheduleEveryXMin }} * * * *"
+  {{- end }}
+  {{- end }}
   concurrencyPolicy: {{ $cronvalue.concurrencyPolicy | default "Forbid" }}
   {{- if $cronvalue.startingDeadlineSeconds }}
   startingDeadlineSeconds: {{ $cronvalue.startingDeadlineSeconds }}
