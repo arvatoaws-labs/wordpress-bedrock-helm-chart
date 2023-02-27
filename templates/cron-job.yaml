@@ -18,13 +18,19 @@ metadata:
     {{- end }}
     checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") $ | sha256sum }}
 spec:
-  {{- $scheduleEveryXMin := dig "scheduleEveryXMin" "" $cronvalue }}
   {{- $schedule := dig "schedule" "" $cronvalue }}
+  {{- $scheduleEveryXHr := dig "scheduleEveryXHr" "" $cronvalue }}
+  {{- $scheduleEveryXMin := dig "scheduleEveryXMin" "" $cronvalue }}
+  {{- $scheduleOnDay := dig "scheduleOnDay" "*" $cronvalue }}
   {{- if $schedule }}
   schedule: "{{ $schedule }}"
+  {{- else if $scheduleEveryXHr }}
+  {{- if ( and ( eq ( mod 24 $scheduleEveryXHr ) 0 ) ( not ( eq ( int $scheduleEveryXHr ) 24 ) ) ) }}
+  schedule: "0 {{ mod ( randNumeric 2 | atoi ) $scheduleEveryXHr }}-23/{{ $scheduleEveryXHr }} * * {{ $scheduleOnDay }}"
+  {{- end }}
   {{- else if $scheduleEveryXMin }}
-  {{- if ( eq ( mod 30 $scheduleEveryXMin ) 0 ) }}
-  schedule: "{{ mod ( randNumeric 2 | atoi ) $scheduleEveryXMin }}-59/{{ $scheduleEveryXMin }} * * * *"
+  {{- if ( and ( eq ( mod 60 $scheduleEveryXMin ) 0 ) ( not ( eq ( int $scheduleEveryXMin ) 60 ) ) ) }}
+  schedule: "{{ mod ( randNumeric 2 | atoi ) $scheduleEveryXMin }}-59/{{ $scheduleEveryXMin }} * * * {{ $scheduleOnDay }}"
   {{- end }}
   {{- end }}
   concurrencyPolicy: {{ $cronvalue.concurrencyPolicy | default "Forbid" }}

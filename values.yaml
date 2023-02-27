@@ -289,13 +289,20 @@ cron:
   jobs:
     wp-cron:
       enabled: true
-      # either schedule or scheduleEveryXMin must be set.
-      # schedule has precedence over scheduleEveryXMin.
-      # schedule uses Cron format.
+      # either schedule or scheduleEveryXHr or scheduleEveryXMin must be set.
+      # schedule has precedence over scheduleEveryXHr and scheduleEveryXMin.
+      # schedule uses Cron syntax format.
       #schedule: "*/5 * * * *"
+      # schedule every x hour using random offset.
+      # scheduleEveryXHr has precedence over scheduleEveryXMin.
+      # valid values are 1, 2, 3, 4, 6, 8, 12.
+      #scheduleEveryXHr: 5
       # schedule every x min using random offset.
-      # scheduleEveryXMin valid values are 1, 2, 3, 5, 6, 10, 15, 20, 30.
+      # valid values are 1, 2, 3, 5, 6, 10, 15, 20, 30.
       scheduleEveryXMin: 5
+      # cron 'day of week' syntax format (default *)
+      # can only be used in conjunction with scheduleEveryXHr or scheduleEveryXMin
+      #scheduleOnDay: 1-5
       command: /scripts/run-cron.sh
       concurrencyPolicy: Replace
       restartPolicy: OnFailure
