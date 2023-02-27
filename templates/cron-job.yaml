@@ -26,7 +26,8 @@ spec:
   schedule: "{{ $schedule }}"
   {{- else if $scheduleEveryXHr }}
   {{- if ( and ( eq ( mod 24 $scheduleEveryXHr ) 0 ) ( not ( eq ( int $scheduleEveryXHr ) 24 ) ) ) }}
-  schedule: "0 {{ mod ( randNumeric 2 | atoi ) $scheduleEveryXHr }}-23/{{ $scheduleEveryXHr }} * * {{ $scheduleOnDay }}"
+  {{- $offsetMinutes := index (list 0 15 30 45) ( mod ( randNumeric 1 | atoi ) 4 ) }}
+  schedule: "{{ $offsetMinutes }} {{ mod ( randNumeric 2 | atoi ) $scheduleEveryXHr }}-23/{{ $scheduleEveryXHr }} * * {{ $scheduleOnDay }}"
   {{- end }}
   {{- else if $scheduleEveryXMin }}
   {{- if ( and ( eq ( mod 60 $scheduleEveryXMin ) 0 ) ( not ( eq ( int $scheduleEveryXMin ) 60 ) ) ) }}
