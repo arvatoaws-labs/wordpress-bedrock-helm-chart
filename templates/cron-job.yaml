@@ -19,19 +19,19 @@ metadata:
     checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") $ | sha256sum }}
 spec:
   {{- $schedule := dig "schedule" "" $cronvalue }}
-  {{- $scheduleEveryXHrs := dig "scheduleEveryXHrs" "" $cronvalue }}
-  {{- $scheduleEveryXMin := dig "scheduleEveryXMin" "" $cronvalue }}
+  {{- $scheduleEveryHrs := dig "scheduleEveryHrs" "" $cronvalue }}
+  {{- $scheduleEveryMin := dig "scheduleEveryMin" "" $cronvalue }}
   {{- $scheduleOnDay := dig "scheduleOnDay" "*" $cronvalue }}
   {{- if $schedule }}
   schedule: "{{ $schedule }}"
-  {{- else if $scheduleEveryXHrs }}
-  {{- if ( and ( eq ( mod 24 $scheduleEveryXHrs ) 0 ) ( not ( eq ( int $scheduleEveryXHrs ) 24 ) ) ) }}
+  {{- else if $scheduleEveryHrs }}
+  {{- if ( and ( eq ( mod 24 $scheduleEveryHrs ) 0 ) ( not ( eq ( int $scheduleEveryHrs ) 24 ) ) ) }}
   {{- $offsetMinutes := index (list 0 15 30 45) ( mod ( randNumeric 1 | atoi ) 4 ) }}
-  schedule: "{{ $offsetMinutes }} {{ mod ( randNumeric 2 | atoi ) $scheduleEveryXHrs }}-23/{{ $scheduleEveryXHrs }} * * {{ $scheduleOnDay }}"
+  schedule: "{{ $offsetMinutes }} {{ mod ( randNumeric 2 | atoi ) $scheduleEveryHrs }}-23/{{ $scheduleEveryHrs }} * * {{ $scheduleOnDay }}"
   {{- end }}
-  {{- else if $scheduleEveryXMin }}
-  {{- if ( and ( eq ( mod 60 $scheduleEveryXMin ) 0 ) ( not ( eq ( int $scheduleEveryXMin ) 60 ) ) ) }}
-  schedule: "{{ mod ( randNumeric 2 | atoi ) $scheduleEveryXMin }}-59/{{ $scheduleEveryXMin }} * * * {{ $scheduleOnDay }}"
+  {{- else if $scheduleEveryMin }}
+  {{- if ( and ( eq ( mod 60 $scheduleEveryMin ) 0 ) ( not ( eq ( int $scheduleEveryMin ) 60 ) ) ) }}
+  schedule: "{{ mod ( randNumeric 2 | atoi ) $scheduleEveryMin }}-59/{{ $scheduleEveryMin }} * * * {{ $scheduleOnDay }}"
   {{- end }}
   {{- end }}
   concurrencyPolicy: {{ $cronvalue.concurrencyPolicy | default "Forbid" }}
