@@ -6,6 +6,7 @@ metadata:
 {{ include "wordpress-bedrock.labels" . | indent 4 }}
   annotations:
     "helm.sh/hook": test-success
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
     "karpenter.sh/do-not-evict": "true"
 spec:
   containers:
