@@ -37,7 +37,7 @@ data:
     [www]
 
     ; if we send this to /proc/self/fd/1, it never appears
-    access.log = /proc/self/fd/2
+    {{ if not .Values.php.fpm.accessLogEnabled }};{{- end }}access.log = /proc/self/fd/2
 
     user = www-data
     group = www-data
