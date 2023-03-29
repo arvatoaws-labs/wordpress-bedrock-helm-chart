@@ -98,6 +98,7 @@ php:
     pullPolicy: IfNotPresent
   resources: {}
   fpm:
+    accessLogEnabled: false
     pm:
       max_children: 10
       start_servers: 2
