@@ -1,8 +1,40 @@
 {{- if .Values.externalSecrets.enabled }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "wordpress-bedrock.fullname" . }}-wait-hook-sa
+  namespace: {{ $.Release.Namespace }}
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ include "wordpress-bedrock.fullname" . }}-wait-hook-role
+  namespace: {{ $.Release.Namespace }}
+rules:
+  - apiGroups: ["external-secrets.io"]
+    resources: ["externalsecrets"]
+    verbs: ["get", "watch", "list"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ include "wordpress-bedrock.fullname" . }}-wait-hook-rb
+  namespace: {{ $.Release.Namespace }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "wordpress-bedrock.fullname" . }}-wait-hook-sa
+    namespace: {{ $.Release.Namespace }}
+roleRef:
+  kind: Role
+  name: {{ include "wordpress-bedrock.fullname" . }}-wait-hook-role
+  apiGroup: rbac.authorization.k8s.io
+---
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ $.Release.Name }}-pre-install-wait-hook
+  name: {{ include "wordpress-bedrock.fullname" . }}-wait-hook
+  namespace: {{ $.Release.Namespace }}
   labels:
 {{ include "wordpress-bedrock.labels" . | indent 4 }}
   annotations:
@@ -31,7 +63,15 @@ spec:
           requests:
             cpu: 10m
             memory: 64Mi
-        image: public.ecr.aws/runecast/busybox:1.33.1
-        command: ['sh', '-c', 'sleep 60']
+        image: ghcr.io/arvatoaws-labs/docker-external-secrets-helper:latest
+        imagePullPolicy: IfNotPresent
+        command:
+          - "wait.sh"
+        env:
+          - name: NAMESPACE
+            value: {{ $.Release.Namespace }}
+          - name: EXTERNALSECRET
+            value: {{ include "wordpress-bedrock.fullname" . }}
       restartPolicy: Never
+      serviceAccountName: {{ include "wordpress-bedrock.fullname" . }}-wait-hook-sa
 {{- end }}
