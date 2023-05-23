@@ -18,6 +18,7 @@ spec:
       annotations:
         karpenter.sh/do-not-evict: "true"
     spec:
+      backoffLimit: 0
       containers:
       - name: setup-efs-base
         securityContext:
