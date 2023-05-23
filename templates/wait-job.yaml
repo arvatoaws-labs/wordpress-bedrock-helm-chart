@@ -69,12 +69,12 @@ metadata:
     "helm.sh/hook-delete-policy": before-hook-creation
 spec:
   ttlSecondsAfterFinished: 600
+  backoffLimit: 0
   template:
     metadata:
       annotations:
         karpenter.sh/do-not-evict: "true"
     spec:
-      backoffLimit: 0
       containers:
       - name: job-done
         securityContext:
