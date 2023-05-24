@@ -79,6 +79,13 @@ spec:
           value: {{ index $.Values.ingress.hosts 0 "host" | quote }}
         - name: WP_PLUGINS
           value: {{ join " " $.Values.plugins | quote }}
+        {{- range $key, $value := $.Values.externalSecrets.env }}
+        - name: {{ $key }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "wordpress-bedrock.fullname" $ }}
+              key: {{ $key | lower | replace "_" "-" }}
+        {{- end }}
     {{- range $key, $value := $.Values.externalSecrets.mapping }}
         - name: {{ $key | upper | replace "-" "_" }}
           valueFrom:

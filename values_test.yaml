@@ -37,14 +37,14 @@ externalSecrets:
   engine: external-secrets
   region: eu-central-1
   backendType: systemManager
-  mapping:
-    db-root-username: /dev/wordpress-1/DB/username
-    db-root-password: /dev/wordpress-1/DB/password
-    db-username: /dev/exampleblog/DB/username
-    db-password: /dev/exampleblog/DB/password
-    wordpress-username: /dev/exampleblog/wordpress/username
-    wordpress-password: /dev/exampleblog/wordpress/password
-    testzeugs: /dev/exampleblog/wordpress/testzeugs
+  env:
+    DB_ROOT_USERNAME: /dev/wordpress-1/DB/username
+    DB_ROOT_PASSWORD: /dev/wordpress-1/DB/password
+    DB_USERNAME: /dev/exampleblog/DB/username
+    DB_PASSWORD: /dev/exampleblog/DB/password
+    WORDPRESS_USERNAME: /dev/exampleblog/wordpress/username
+    WORDPRESS_PASSWORD: /dev/exampleblog/wordpress/password
+    TESTZEUGS: /dev/exampleblog/wordpress/testzeugs
 
 env:
   DB_NAME: bedrocksample

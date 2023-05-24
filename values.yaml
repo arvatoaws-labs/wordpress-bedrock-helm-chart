@@ -186,6 +186,15 @@ externalSecrets:
   refreshInterval: "0"
   region: eu-central-1
   backendType: systemManager
+  # additional environment variables passed directly to containers. Env values represent parameter store keys. 
+  env:
+#    DB_ROOT_USERNAME: /dev/wordpress-1/DB/username
+#    DB_ROOT_PASSWORD: /dev/wordpress-1/DB/password
+#    DB_USERNAME: /dev/exampleblog/DB/username
+#    DB_PASSWORD: /dev/exampleblog/DB/password
+#    WORDPRESS_USERNAME: /dev/exampleblog/wordpress/username
+#    WORDPRESS_PASSWORD: /dev/exampleblog/wordpress/password
+  # 'mapping' is deprecated and will be removed in upcoming releases. Please use 'externalSecrets.env' instead.
   mapping:
 #    db-root-username: /dev/wordpress-1/DB/username
 #    db-root-password: /dev/wordpress-1/DB/password

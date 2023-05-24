@@ -45,6 +45,17 @@ spec:
           env:
           - name: WORDPRESS_TABLE_PREFIX
             value: "wp_"
+          {{- range $key, $value := .Values.externalSecrets.env }}
+          {{- if (contains "DB_" $key) }}
+          {{- if not (contains "_ROOT_" $key) }}
+          - name: WORDPRESS_{{ $key | replace "USERNAME" "USER" }}
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "wordpress-bedrock.fullname" $ }}
+                key: {{ $key | lower | replace "_" "-" }}
+          {{- end }}
+          {{- end }}
+          {{- end }}
       {{- range $key, $value := .Values.externalSecrets.mapping }}
           {{- if (contains "db-" $key) }}
           {{- if not (contains "-root-" $key) }}
