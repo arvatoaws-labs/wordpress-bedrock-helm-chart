@@ -56,6 +56,14 @@ spec:
           {{- end }}
           {{- end }}
       {{- end }}
+          {{- with .Values.env }}
+          {{- range $key, $value := . }}
+          {{- if (contains "DB" $key) }}
+          - name: {{ $key }}
+            value: {{ $value | quote }}
+          {{- end }}
+          {{- end }}
+          {{- end }}
       {{- range .Values.extraEnv }}
           {{- if (contains "DB" .name) }}
           - name: WORDPRESS_{{ .name }}

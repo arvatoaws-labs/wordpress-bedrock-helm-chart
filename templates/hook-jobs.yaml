@@ -86,6 +86,12 @@ spec:
               name: {{ template "wordpress-bedrock.fullname" $ }}
               key: {{ $key }}
     {{- end }}
+        {{- with $.Values.env }}
+        {{- range $key, $value := . }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end }}
+        {{- end }}
 {{- if $.Values.extraEnv }}
 {{ toYaml $.Values.extraEnv | indent 8 }}
 {{- end }}

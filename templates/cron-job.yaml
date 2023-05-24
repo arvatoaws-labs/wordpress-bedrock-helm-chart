@@ -79,7 +79,7 @@ spec:
                   fieldRef:
                     apiVersion: v1
                     fieldPath: metadata.labels['topology.kubernetes.io/zone']
-            {{- if $.Values.offload.bucket }}
+              {{- if $.Values.offload.bucket }}
               - name: WP_OFFLOAD_BUCKET
                 value: {{ $.Values.offload.bucket | quote }}
               - name: WP_OFFLOAD_REGION
@@ -90,7 +90,7 @@ spec:
                 value: {{ $.Values.offload.cloudfront | quote }}
               - name: WP_OFFLOAD_LOCAL_DOMAINS
                 value: {{ $.Values.offload.local_domains | quote }}
-          {{- end }}
+              {{- end }}
               - name: WP_DEFAULT_HOST
                 value: {{ index $.Values.ingress.hosts 0 "host" | quote }}
               - name: WP_PLUGINS
@@ -106,6 +106,12 @@ spec:
               {{- end }}
               {{- end }}
           {{- end }}
+              {{- with $.Values.env }}
+              {{- range $key, $value := . }}
+              - name: {{ $key }}
+                value: {{ $value | quote }}
+              {{- end }}
+              {{- end }}
       {{- if $.Values.extraEnv }}
 {{ toYaml $.Values.extraEnv | indent 14 }}
       {{- end }}

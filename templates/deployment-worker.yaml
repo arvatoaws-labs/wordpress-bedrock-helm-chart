@@ -162,6 +162,12 @@ spec:
             {{- end }}
             {{- end }}
           {{- end }}
+          {{- with .Values.env }}
+          {{- range $key, $value := . }}
+          - name: {{ $key }}
+            value: {{ $value | quote }}
+          {{- end }}
+          {{- end }}
       {{- if .Values.extraEnv }}
 {{ toYaml .Values.extraEnv | indent 10 }}
       {{- end }}

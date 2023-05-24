@@ -46,9 +46,8 @@ externalSecrets:
     wordpress-password: /dev/exampleblog/wordpress/password
     testzeugs: /dev/exampleblog/wordpress/testzeugs
 
-extraEnv:
-  - name: DB_NAME
-    value: bedrocksample
+env:
+  DB_NAME: bedrocksample
 
 hpa:
   engine: keda

@@ -124,7 +124,12 @@ php:
   readOnlyWebFilesystem: true
   extraVolumeMounts:  []
 
-## Additional environment variables to set
+# additional environment variables passed directly to containers.
+env: {}
+#  FOO: bar
+
+# Additional environment variables to set.
+# extraEnv does not provide value merge accross multiple values files and thus is deprecated.
 extraEnv: []
 # extraEnv:
 #   - name: FOO
