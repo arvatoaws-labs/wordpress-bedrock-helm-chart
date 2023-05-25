@@ -63,7 +63,7 @@ efs:
 nginx:
   image:
     repository: public.ecr.aws/nginx/nginx
-    tag: 1.23
+    tag: 1.25
     pullPolicy: IfNotPresent
   resources: {}
   disallow_robots: false
