@@ -73,12 +73,12 @@ spec:
       serverAddress: "{{ .Values.hpa.prometheus.serverAddress }}"
       metricName: phpfpm_active_processes
       threshold: '{{ .Values.hpa.targets.php }}'
-      query: sum(phpfpm_active_processes{service="{{ include "wordpress-bedrock.fullname" . }}",namespace="{{ .Release.Namespace }}"})
+      query: sum(phpfpm_active_processes{service="{{ include "wordpress-bedrock.fullname" . }}-worker",namespace="{{ .Release.Namespace }}"})
   - type: prometheus
     metadata:
       serverAddress: "{{ .Values.hpa.prometheus.serverAddress }}"
       metricName: nginx_connections_active
       threshold: '{{ .Values.hpa.targets.nginx }}'
-      query: sum(nginx_connections_active{service="{{ include "wordpress-bedrock.fullname" . }}",namespace="{{ .Release.Namespace }}"})
+      query: sum(nginx_connections_active{service="{{ include "wordpress-bedrock.fullname" . }}-worker",namespace="{{ .Release.Namespace }}"})
 {{- end }}
 {{- end }}
