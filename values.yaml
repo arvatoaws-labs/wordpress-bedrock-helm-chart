@@ -213,6 +213,9 @@ monitoring:
     # Set how frequently Prometheus should scrape
     # interval: 30s
 
+init:
+  resources: {}
+
 exporter:
   nginx:
     image:

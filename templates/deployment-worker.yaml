@@ -48,6 +48,8 @@ spec:
           - name: web-volume
             mountPath: /var/www/html
             readOnly: false
+          resources:
+            {{- toYaml .Values.init.resources | nindent 12 }}
       containers:
         - name: {{ .Chart.Name }}-nginx
           securityContext:
