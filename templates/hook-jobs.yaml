@@ -86,13 +86,6 @@ spec:
               name: {{ template "wordpress-bedrock.fullname" $ }}
               key: {{ $key | lower | replace "_" "-" }}
         {{- end }}
-    {{- range $key, $value := $.Values.externalSecrets.mapping }}
-        - name: {{ $key | upper | replace "-" "_" }}
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "wordpress-bedrock.fullname" $ }}
-              key: {{ $key }}
-    {{- end }}
         {{- with $.Values.env }}
         {{- range $key, $value := . }}
         - name: {{ $key }}

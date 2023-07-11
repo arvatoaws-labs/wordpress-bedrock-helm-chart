@@ -56,17 +56,6 @@ spec:
           {{- end }}
           {{- end }}
           {{- end }}
-      {{- range $key, $value := .Values.externalSecrets.mapping }}
-          {{- if (contains "db-" $key) }}
-          {{- if not (contains "-root-" $key) }}
-          - name: WORDPRESS_{{ $key | upper | replace "-" "_" | replace "USERNAME" "USER" }}
-            valueFrom:
-              secretKeyRef:
-                name: {{ template "wordpress-bedrock.fullname" $ }}
-                key: {{ $key }}
-          {{- end }}
-          {{- end }}
-      {{- end }}
           {{- with .Values.env }}
           {{- range $key, $value := . }}
           {{- if (contains "DB" $key) }}
