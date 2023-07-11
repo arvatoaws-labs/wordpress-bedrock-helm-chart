@@ -172,9 +172,6 @@ spec:
             value: {{ $value | quote }}
           {{- end }}
           {{- end }}
-      {{- if .Values.extraEnv }}
-{{ toYaml .Values.extraEnv | indent 10 }}
-      {{- end }}
           resources:
             {{- toYaml .Values.php.resources | nindent 12 }}
 {{- if ( .Values.monitoring.enabled ) }}

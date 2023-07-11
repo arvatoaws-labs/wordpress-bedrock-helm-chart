@@ -108,9 +108,6 @@ spec:
                 value: {{ $value | quote }}
               {{- end }}
               {{- end }}
-      {{- if $.Values.extraEnv }}
-{{ toYaml $.Values.extraEnv | indent 14 }}
-      {{- end }}
             volumeMounts:
             - mountPath: /usr/local/etc/php/conf.d/cron.ini
               name: config-volume

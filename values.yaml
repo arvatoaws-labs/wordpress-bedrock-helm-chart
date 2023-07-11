@@ -128,16 +128,6 @@ php:
 env: {}
 #  FOO: bar
 
-# Additional environment variables to set.
-# extraEnv does not provide value merge accross multiple values files and thus is deprecated.
-extraEnv: []
-# extraEnv:
-#   - name: FOO
-#     valueFrom:
-#       secretKeyRef:
-#         key: FOO
-#         name: secret-resource
-
 # settings are used for WP Offload Media plugin
 offload:
   bucket: null
