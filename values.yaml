@@ -128,16 +128,6 @@ php:
 env: {}
 #  FOO: bar
 
-# Additional environment variables to set.
-# extraEnv does not provide value merge accross multiple values files and thus is deprecated.
-extraEnv: []
-# extraEnv:
-#   - name: FOO
-#     valueFrom:
-#       secretKeyRef:
-#         key: FOO
-#         name: secret-resource
-
 # settings are used for WP Offload Media plugin
 offload:
   bucket: null
@@ -194,14 +184,6 @@ externalSecrets:
 #    DB_PASSWORD: /dev/exampleblog/DB/password
 #    WORDPRESS_USERNAME: /dev/exampleblog/wordpress/username
 #    WORDPRESS_PASSWORD: /dev/exampleblog/wordpress/password
-  # 'mapping' is deprecated and will be removed in upcoming releases. Please use 'externalSecrets.env' instead.
-  mapping:
-#    db-root-username: /dev/wordpress-1/DB/username
-#    db-root-password: /dev/wordpress-1/DB/password
-#    db-username: /dev/exampleblog/DB/username
-#    db-password: /dev/exampleblog/DB/password
-#    wordpress-username: /dev/exampleblog/wordpress/username
-#    wordpress-password: /dev/exampleblog/wordpress/password
 
 monitoring:
   enabled: true

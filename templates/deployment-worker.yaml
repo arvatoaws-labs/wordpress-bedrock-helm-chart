@@ -37,6 +37,8 @@ spec:
       serviceAccountName: {{ template "wordpress-bedrock.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      # extend the pods shutdown grace period from the default of 30s to 60s
+      terminationGracePeriodSeconds: 60
       initContainers:
         - name: copy-files
           securityContext:
@@ -164,26 +166,12 @@ spec:
           {{- end }}
           {{- end }}
           {{- end }}
-          {{- range $key, $value := .Values.externalSecrets.mapping }}
-            {{- if not (contains "wordpress-" $key) }}
-            {{- if not (contains "-root-" $key) }}
-          - name: {{ $key | upper | replace "-" "_" }}
-            valueFrom:
-              secretKeyRef:
-                name: {{ template "wordpress-bedrock.fullname" $ }}
-                key: {{ $key }}
-            {{- end }}
-            {{- end }}
-          {{- end }}
           {{- with .Values.env }}
           {{- range $key, $value := . }}
           - name: {{ $key }}
             value: {{ $value | quote }}
           {{- end }}
           {{- end }}
-      {{- if .Values.extraEnv }}
-{{ toYaml .Values.extraEnv | indent 10 }}
-      {{- end }}
           resources:
             {{- toYaml .Values.php.resources | nindent 12 }}
 {{- if ( .Values.monitoring.enabled ) }}

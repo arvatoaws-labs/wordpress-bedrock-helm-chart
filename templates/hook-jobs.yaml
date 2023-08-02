@@ -86,22 +86,12 @@ spec:
               name: {{ template "wordpress-bedrock.fullname" $ }}
               key: {{ $key | lower | replace "_" "-" }}
         {{- end }}
-    {{- range $key, $value := $.Values.externalSecrets.mapping }}
-        - name: {{ $key | upper | replace "-" "_" }}
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "wordpress-bedrock.fullname" $ }}
-              key: {{ $key }}
-    {{- end }}
         {{- with $.Values.env }}
         {{- range $key, $value := . }}
         - name: {{ $key }}
           value: {{ $value | quote }}
         {{- end }}
         {{- end }}
-{{- if $.Values.extraEnv }}
-{{ toYaml $.Values.extraEnv | indent 8 }}
-{{- end }}
         volumeMounts:
           - mountPath: /etc/php/7.2/fpm/php-fpm.conf
             name: config-volume

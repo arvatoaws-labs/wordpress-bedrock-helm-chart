@@ -1,11 +1,7 @@
 {{- if $.Values.cron.jobs }}
 {{- range $cronkey, $cronvalue := $.Values.cron.jobs }}
 {{- if $cronvalue.enabled }}
-{{- if semverCompare ">=1.21-0" $.Capabilities.KubeVersion.GitVersion -}}
 apiVersion: batch/v1
-{{- else -}}
-apiVersion: batch/v1beta1
-{{- end }}
 kind: CronJob
 metadata:
   {{- $nameMaxLength := len $cronkey | sub 51 | int }}
@@ -106,26 +102,12 @@ spec:
               {{- end }}
               {{- end }}
               {{- end }}
-          {{- range $key, $value := $.Values.externalSecrets.mapping }}
-              {{- if not (contains "wordpress-" $key) }}
-              {{- if not (contains "-root-" $key) }}
-              - name: {{ $key | upper | replace "-" "_" }}
-                valueFrom:
-                  secretKeyRef:
-                    name: {{ template "wordpress-bedrock.fullname" $ }}
-                    key: {{ $key }}
-              {{- end }}
-              {{- end }}
-          {{- end }}
               {{- with $.Values.env }}
               {{- range $key, $value := . }}
               - name: {{ $key }}
                 value: {{ $value | quote }}
               {{- end }}
               {{- end }}
-      {{- if $.Values.extraEnv }}
-{{ toYaml $.Values.extraEnv | indent 14 }}
-      {{- end }}
             volumeMounts:
             - mountPath: /usr/local/etc/php/conf.d/cron.ini
               name: config-volume
