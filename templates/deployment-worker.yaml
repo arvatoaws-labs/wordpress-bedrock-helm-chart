@@ -45,10 +45,10 @@ spec:
             runAsUser: 0
           image: "{{ .Values.php.image.repository }}:{{ .Values.php.image.tag }}"
           imagePullPolicy: {{ .Values.php.image.pullPolicy }}
-          command: ['sh', '-c', 'chown -R 82:2000 /var/www/html && cp -r /app/* /var/www/html && chown -R 82:2000 /var/www/html']
+          command: ['sh', '-c', 'cp -r /var/www/html/* /tmp && chown -R www-data:2000 /tmp']
           volumeMounts:
           - name: web-volume
-            mountPath: /var/www/html
+            mountPath: /tmp
             readOnly: false
           resources:
             {{- toYaml .Values.init.resources | nindent 12 }}
