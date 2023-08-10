@@ -77,6 +77,7 @@ nginx:
   cache_control:
     expires: max
     js_css_enabled: true
+  accessLogEnabled: true
   fastcgi_buffer_size: 16k
   fastcgi_buffers_number: 16
   fastcgi_buffers_size: 8k
