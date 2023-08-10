@@ -201,7 +201,11 @@ data:
         {{ .Values.nginx.additional_config | nindent 8 }}
         {{- end }}
 
+        {{- if .Values.nginx.accessLogEnabled }}
         access_log /dev/stdout main;
+        {{- else }}
+        access_log off;
+        {{- end }}
         error_log /dev/stderr;
 
         #error_page  404              /404.html;
