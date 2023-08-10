@@ -54,7 +54,6 @@ spec:
       - name: {{ $hookname }}
         image: "{{ $.Values.php.image.repository }}:{{ $.Values.php.image.tag }}"
         imagePullPolicy: {{ $.Values.php.image.pullPolicy }}
-        workingDir: /app
         command:
         - /scripts/{{ $hookname }}.sh
         env:

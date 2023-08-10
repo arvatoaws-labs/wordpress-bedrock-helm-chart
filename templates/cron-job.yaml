@@ -66,7 +66,6 @@ spec:
             {{- toYaml $.Values.php.securityContext | nindent 14 }}
             image: "{{ $.Values.php.image.repository }}:{{ $.Values.php.image.tag }}"
             imagePullPolicy: {{ $.Values.php.image.pullPolicy }}
-            workingDir: /app
             command:
             - {{ $cronvalue.command }}
             env:
