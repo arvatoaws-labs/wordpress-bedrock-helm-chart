@@ -34,7 +34,7 @@ spec:
             mountPath: /tmp
             readOnly: false
 {{- range $key := .Values.efs.extraDirs }}
-      - name: setup-efs-extra-{{ $key | replace "/" "_" | lower }}
+      - name: setup-efs-extra-{{ $key | replace "/" "-" | replace "_" "-" | lower }}
         securityContext:
           runAsUser: 0
         resources:
