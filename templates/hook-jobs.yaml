@@ -54,7 +54,6 @@ spec:
       - name: {{ $hookname }}
         image: "{{ $.Values.php.image.repository }}:{{ $.Values.php.image.tag }}"
         imagePullPolicy: {{ $.Values.php.image.pullPolicy }}
-        workingDir: /app
         command:
         - /scripts/{{ $hookname }}.sh
         env:
@@ -93,23 +92,15 @@ spec:
         {{- end }}
         {{- end }}
         volumeMounts:
-          - mountPath: /etc/php/7.2/fpm/php-fpm.conf
-            name: config-volume
-            subPath: fpm.conf
-            readOnly: true
-          - mountPath: /tmp
-            name: tmp-volume
+          - name: tmp-volume
+            mountPath: /tmp
+            readOnly: false
       {{- end }}
       {{- end }}
       restartPolicy: Never
       volumes:
       - name: tmp-volume
         emptyDir: {}
-      - name: config-volume
-        configMap:
-          # Provide the name of the ConfigMap containing the files you want
-          # to add to the container
-          name: {{ template "wordpress-bedrock.fullname" $ }}
   backoffLimit: 1
 ---
 {{- end }}

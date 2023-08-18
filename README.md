@@ -1,10 +1,10 @@
 # wordpress-bedrock-helm-chart
 
-This chart is for use with the wordpress bedrock. In order to use it you must build a custom php-fpm image with the correspondig directory structure.
+This chart is for use with wordpress bedrock. In order to use it you must build a custom php-fpm image with the application code located in /var/www/html.
 
-The init container of this chart copies the content of /app to /var/www/html. The /var/www/html volume is shared between the nginx and the php-fpm container.
+The init container of this chart prepares a volume for /var/www/html, which is then shared between the nginx and the php-fpm container.
 
-The setup is tested on AWS EKS and sacles well. A typical setup would look like this:
+The setup is tested on AWS EKS and scales well. A typical setup would look like this:
 
 ```
 Cloudfront (blog.example.com) <-> AWS WF       Cloudfront (static.example.com)
@@ -17,7 +17,7 @@ Cloudfront (blog.example.com) <-> AWS WF       Cloudfront (static.example.com)
      |          |
    nginx      php-fpm
          |
-   shared volume (EmptyDir synced from /app)
+   shared volume (EmptyDir synced from /var/www/html)
    
    
          |

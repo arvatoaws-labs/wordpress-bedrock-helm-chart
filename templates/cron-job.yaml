@@ -66,7 +66,6 @@ spec:
             {{- toYaml $.Values.php.securityContext | nindent 14 }}
             image: "{{ $.Values.php.image.repository }}:{{ $.Values.php.image.tag }}"
             imagePullPolicy: {{ $.Values.php.image.pullPolicy }}
-            workingDir: /app
             command:
             - {{ $cronvalue.command }}
             env:
@@ -116,11 +115,9 @@ spec:
             - name: tmp-volume
               mountPath: /tmp
               readOnly: false
-{{- if $.Values.efs.enabled }}
-            - name: efs
-              mountPath: /var/www/html/web/{{ $.Values.efs.mountPath }}
+            - name: uploads-volume
+              mountPath: /var/www/html/web/app/uploads
               readOnly: false
-{{- end }}
             resources:
               {{- if $cronvalue.resources }}
               {{- toYaml $cronvalue.resources | nindent 14 }}
@@ -148,12 +145,8 @@ spec:
               name: {{ include "wordpress-bedrock.fullname" $ }}
           - name: tmp-volume
             emptyDir: {}
-{{- if $.Values.efs.enabled }}
-          - name: efs
-            nfs:
-              path: /{{ $.Values.efs.subPath }}
-              server: {{ $.Values.efs.fsid }}.efs.{{ $.Values.efs.awsRegion }}.amazonaws.com
-{{- end }}
+          - name: uploads-volume
+            emptyDir: {}
 ---
 {{- end }}
 {{- end }}
