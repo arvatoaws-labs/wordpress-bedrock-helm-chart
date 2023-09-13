@@ -58,6 +58,7 @@ efs:
   # fsid: fs-12345
   # subPath: defaults to release name
   awsRegion: eu-central-1
+  storageClassName: efs
   extraDirs: []
 
 nginx:

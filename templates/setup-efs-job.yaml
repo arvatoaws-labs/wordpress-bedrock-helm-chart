@@ -50,8 +50,7 @@ spec:
 {{- end }}
       restartPolicy: Never
       volumes:
-      - name: efs
-        nfs:
-          path: /
-          server: {{ .Values.efs.fsid }}.efs.{{ .Values.efs.awsRegion }}.amazonaws.com
+        name: efs
+        persistentVolumeClaim:
+          claimName: {{ template "wordpress-bedrock.fullname" . }}
 {{- end }}
