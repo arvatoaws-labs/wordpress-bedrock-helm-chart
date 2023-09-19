@@ -7,7 +7,7 @@ metadata:
   labels:
     {{- include "wordpress-bedrock.labels" . | nindent 4 }}
   annotations:
-    "helm.sh/hook": pre-install, pre-upgrade
+    "helm.sh/hook": pre-install
     "helm.sh/hook-weight": "0"
 spec:
   capacity:
@@ -31,7 +31,7 @@ metadata:
   labels:
     {{- include "wordpress-bedrock.labels" . | nindent 4 }}
   annotations:
-    "helm.sh/hook": pre-install, pre-upgrade
+    "helm.sh/hook": pre-install
     "helm.sh/hook-weight": "0"
 spec:
   accessModes:
