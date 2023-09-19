@@ -50,7 +50,7 @@ spec:
 {{- end }}
       restartPolicy: Never
       volumes:
-        name: efs
-        persistentVolumeClaim:
-          claimName: {{ template "wordpress-bedrock.fullname" . }}
+        - name: efs
+          persistentVolumeClaim:
+            claimName: {{ template "wordpress-bedrock.fullname" . }}
 {{- end }}

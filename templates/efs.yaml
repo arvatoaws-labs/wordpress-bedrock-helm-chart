@@ -22,7 +22,7 @@ spec:
     volumeHandle: {{ .Values.efs.fsid }}
   claimRef:
     name: {{ template "wordpress-bedrock.fullname" . }}
-    namespace: {{ template "wordpress-bedrock.fullname" . }}
+    namespace: {{ .Release.Namespace }}
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1

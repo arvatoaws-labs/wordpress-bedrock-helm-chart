@@ -258,9 +258,8 @@ spec:
 {{- end }}
 {{- if .Values.efs.enabled }}
       - name: efs
-        nfs:
-          path: /{{ include "wordpress-bedrock.efsSubPath" . }}
-          server: {{ .Values.efs.fsid }}.efs.{{ .Values.efs.awsRegion }}.amazonaws.com
+        persistentVolumeClaim:
+          claimName: {{ template "wordpress-bedrock.fullname" . }}
 {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
