@@ -1,38 +1,12 @@
 {{- if .Values.efs.enabled -}}
 ---
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: {{ template "wordpress-bedrock.fullname" . }}
-  labels:
-    {{- include "wordpress-bedrock.labels" . | nindent 4 }}
-  annotations:
-    "helm.sh/hook": pre-install
-    "helm.sh/hook-weight": "0"
-spec:
-  capacity:
-    storage: 5Gi
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteMany
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: {{ .Values.efs.storageClassName }}
-  csi:
-    driver: efs.csi.aws.com
-    volumeHandle: {{ .Values.efs.fsid }}
-  claimRef:
-    name: {{ template "wordpress-bedrock.fullname" . }}
-    namespace: {{ .Release.Namespace }}
----
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: {{ template "wordpress-bedrock.fullname" . }}
+  name: {{ $.Release.Name }}
   labels:
     {{- include "wordpress-bedrock.labels" . | nindent 4 }}
   annotations:
-    "helm.sh/hook": pre-install
-    "helm.sh/hook-weight": "0"
 spec:
   accessModes:
     - ReadWriteMany
@@ -40,5 +14,4 @@ spec:
     requests:
       storage: 5Gi
   storageClassName: {{ .Values.efs.storageClassName }}
-  volumeName: {{ template "wordpress-bedrock.fullname" . }}
 {{- end -}}

@@ -259,7 +259,7 @@ spec:
 {{- if .Values.efs.enabled }}
       - name: efs
         persistentVolumeClaim:
-          claimName: {{ template "wordpress-bedrock.fullname" . }}
+          claimName: {{ $.Release.Name }}
 {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
