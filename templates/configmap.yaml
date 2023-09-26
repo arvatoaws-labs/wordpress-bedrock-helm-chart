@@ -28,6 +28,11 @@ data:
 {{- end }}
 {{- end }}
 {{- end }}
+  hooks.ini: |-
+    [PHP]
+    {{- range $key, $value := $.Values.hooks.php }}
+    {{ $key }} = {{ $value }}
+    {{- end }}
   php-fpm.conf: |-
     [global]
 

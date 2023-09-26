@@ -1,5 +1,5 @@
-{{- if $.Values.hooks }}
-{{- range $hooktype, $hookvalue := $.Values.hooks }}
+{{- if $.Values.hooks.type }}
+{{- range $hooktype, $hookvalue := $.Values.hooks.type }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -43,9 +43,7 @@ spec:
           runAsNonRoot: true
           runAsUser: 65534
         resources:
-          requests:
-            cpu: 10m
-            memory: 64Mi
+          {{- toYaml $.Values.hooks.init.resources | nindent 10 }}
         image: public.ecr.aws/runecast/busybox:1.33.1
         command: ['sh', '-c', 'echo "all jobs completed"']
       initContainers:
@@ -95,10 +93,19 @@ spec:
           - name: tmp-volume
             mountPath: /tmp
             readOnly: false
+          - mountPath: /usr/local/etc/php/conf.d/hooks.ini
+            name: config-volume
+            subPath: hooks.ini
+            readOnly: true
       {{- end }}
       {{- end }}
       restartPolicy: Never
       volumes:
+      - name: config-volume
+        configMap:
+          # Provide the name of the ConfigMap containing the files you want
+          # to add to the container
+          name: {{ include "wordpress-bedrock.fullname" $ }}
       - name: tmp-volume
         emptyDir: {}
   backoffLimit: 1
