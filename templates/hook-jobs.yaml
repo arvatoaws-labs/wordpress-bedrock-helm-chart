@@ -105,7 +105,7 @@ spec:
         configMap:
           # Provide the name of the ConfigMap containing the files you want
           # to add to the container
-          name: {{ include "wordpress-bedrock.fullname" . }}
+          name: {{ include "wordpress-bedrock.fullname" $ }}
       - name: tmp-volume
         emptyDir: {}
   backoffLimit: 1
