@@ -1,0 +1,17 @@
+{{- if .Values.efs.enabled -}}
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ $.Release.Name }}
+  labels:
+    {{- include "wordpress-bedrock.labels" . | nindent 4 }}
+  annotations:
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: {{ .Values.efs.storageClassName }}
+{{- end -}}

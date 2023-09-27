@@ -58,6 +58,9 @@ efs:
   # fsid: fs-12345
   # subPath: defaults to release name
   awsRegion: eu-central-1
+  #storageClassName: efs
+  storageClassName: efs-dynamic
+  # extra Dirs not needed anymore
   extraDirs: []
 
 nginx:
@@ -186,7 +189,7 @@ externalSecrets:
   refreshInterval: "0"
   region: eu-central-1
   backendType: systemManager
-  # additional environment variables passed directly to containers. Env values represent parameter store keys. 
+  # additional environment variables passed directly to containers. Env values represent parameter store keys.
   env:
 #    DB_ROOT_USERNAME: /dev/wordpress-1/DB/username
 #    DB_ROOT_PASSWORD: /dev/wordpress-1/DB/password
