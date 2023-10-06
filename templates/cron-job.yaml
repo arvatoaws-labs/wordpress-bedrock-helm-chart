@@ -30,6 +30,9 @@ spec:
   schedule: "{{ mod ( randNumeric 2 | atoi ) $scheduleEveryMin }}-59/{{ $scheduleEveryMin }} * * * {{ $scheduleOnDay }}"
   {{- end }}
   {{- end }}
+  {{- if semverCompare ">=1.27-0" $.Capabilities.KubeVersion.GitVersion }}
+  timeZone: {{ $cronvalue.timeZone | default $.Values.cron.timeZone | quote }}
+  {{- end }}
   concurrencyPolicy: {{ $cronvalue.concurrencyPolicy | default "Forbid" }}
   {{- if $cronvalue.startingDeadlineSeconds }}
   startingDeadlineSeconds: {{ $cronvalue.startingDeadlineSeconds }}

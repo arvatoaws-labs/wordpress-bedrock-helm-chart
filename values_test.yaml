@@ -76,6 +76,7 @@ cron:
   jobs:
     job1:
       enabled: true
+      timeZone: Etc/UTC
       schedule: "*/5 * * * *"
       command: wp --version
       concurrencyPolicy: Replace
