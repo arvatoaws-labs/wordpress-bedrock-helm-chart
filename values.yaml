@@ -290,6 +290,7 @@ affinity: {}
 
 # this section allows to configure cron jobs
 cron:
+  timeZone: Europe/Berlin
   # this resources and php defaults will be applied if not get overwritten in the specific job
   resources:
     limits:
