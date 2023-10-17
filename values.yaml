@@ -147,6 +147,7 @@ offload:
 # these plugins will be activated using the activate-wp-plugins hook
 plugins:
   - amazon-s3-and-cloudfront
+  - amazon-s3-and-cloudfront-pro
   - amazon-s3-and-cloudfront-tweaks
 
 wordpress:
