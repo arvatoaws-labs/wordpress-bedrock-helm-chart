@@ -139,6 +139,10 @@ offload:
   domain: null
   cloudfront: null
   local_domains: null
+  privateKey:
+    enabled: false
+    filePath: /var/local/
+    fileName: wpoffload_private.pem
 
 # these plugins will be activated using the activate-wp-plugins hook
 plugins:
