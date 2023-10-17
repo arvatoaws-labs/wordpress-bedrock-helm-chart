@@ -52,6 +52,35 @@ spec:
             readOnly: false
           resources:
             {{- toYaml .Values.init.resources | nindent 12 }}
+        {{- if .Values.offload.privateKey.enabled }}  
+        - name: prepare-private-key
+          securityContext:
+            runAsUser: 0
+          image: "{{ .Values.php.image.repository }}:{{ .Values.php.image.tag }}"
+          imagePullPolicy: {{ .Values.php.image.pullPolicy }}
+          command: ['sh', '-c']
+          args:
+          - if [ "$WP_OFFLOAD_PRIVATE_KEY_BASE64" = "" ]; then echo "please define WP_OFFLOAD_PRIVATE_KEY_BASE64"; exit 1; fi;
+            echo "$WP_OFFLOAD_PRIVATE_KEY_BASE64" | base64 -d > /tmp/"$WP_OFFLOAD_PRIVATE_KEY_FILE_NAME";
+          env:
+          - name: WP_OFFLOAD_PRIVATE_KEY_FILE_NAME
+            value: {{ .Values.offload.privateKey.fileName | quote }}
+          {{- range $key, $value := .Values.externalSecrets.env }}
+          {{- if (eq "WP_OFFLOAD_PRIVATE_KEY_BASE64" $key) }}
+          - name: {{ $key }}
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "wordpress-bedrock.fullname" $ }}
+                key: {{ $key | lower | replace "_" "-" }}
+          {{- end }}
+          {{- end }}
+          volumeMounts:
+          - name: key-volume
+            mountPath: /tmp
+            readOnly: false
+          resources:
+            {{- toYaml .Values.init.resources | nindent 12 }}   
+        {{- end }}
       containers:
         - name: {{ .Chart.Name }}-nginx
           securityContext:
@@ -123,6 +152,11 @@ spec:
           - name: tmp-volume
             mountPath: /tmp
             readOnly: false
+          {{- if .Values.offload.privateKey.enabled }}
+          - name: key-volume
+            mountPath: {{ .Values.offload.privateKey.filePath }}
+            readOnly: true
+          {{- end }}
 {{- if .Values.php.extraVolumeMounts }}
           {{- toYaml .Values.php.extraVolumeMounts | nindent 10 }}
 {{- end }}
@@ -151,19 +185,21 @@ spec:
           - name: WP_OFFLOAD_LOCAL_DOMAINS
             value: {{ $.Values.offload.local_domains | quote }}
           {{- end }}
+          {{- if $.Values.offload.privateKey.enabled }}
+          - name: WP_OFFLOAD_PRIVATE_KEY_FILE_PATH
+            value: {{ printf "%s%s" $.Values.offload.privateKey.filePath $.Values.offload.privateKey.fileName | quote }}
+          {{- end }}
           - name: WP_DEFAULT_HOST
             value: {{ index $.Values.ingress.hosts 0 "host" | quote }}
           - name: WP_PLUGINS
             value: {{ join " " $.Values.plugins | quote }}
           {{- range $key, $value := .Values.externalSecrets.env }}
-          {{- if not (contains "WORDPRESS_" $key) }}
-          {{- if not (contains "_ROOT_" $key) }}
+          {{- if and (not (contains "WORDPRESS_" $key)) (not (contains "_ROOT_" $key)) (not (eq "WP_OFFLOAD_PRIVATE_KEY_BASE64" $key)) }}
           - name: {{ $key }}
             valueFrom:
               secretKeyRef:
                 name: {{ template "wordpress-bedrock.fullname" $ }}
                 key: {{ $key | lower | replace "_" "-" }}
-          {{- end }}
           {{- end }}
           {{- end }}
           {{- with .Values.env }}
@@ -250,6 +286,10 @@ spec:
         emptyDir: {}
       - name: uploads-volume
         emptyDir: {}
+      {{- if .Values.offload.privateKey.enabled }}
+      - name: key-volume
+        emptyDir: {}
+      {{- end }}
 {{- range $key, $value := .Values.php.extraVolumeMounts }}
 {{- if not (contains "efs" $value.name ) }}
       - name: {{ $value.name }}
