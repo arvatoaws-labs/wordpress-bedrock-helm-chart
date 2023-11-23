@@ -121,6 +121,9 @@ spec:
             - name: uploads-volume
               mountPath: /var/www/html/web/app/uploads
               readOnly: false
+            {{- if $cronvalue.extraVolumeMounts }}
+            {{- toYaml $cronvalue.extraVolumeMounts | nindent 12 }}
+            {{- end }}
             resources:
               {{- if $cronvalue.resources }}
               {{- toYaml $cronvalue.resources | nindent 14 }}
@@ -150,6 +153,11 @@ spec:
             emptyDir: {}
           - name: uploads-volume
             emptyDir: {}
+          {{- if $.Values.efs.enabled }}
+          - name: efs
+            persistentVolumeClaim:
+              claimName: {{ $.Release.Name }}
+          {{- end }}
 ---
 {{- end }}
 {{- end }}
