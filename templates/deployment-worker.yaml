@@ -256,7 +256,7 @@ spec:
           - name: NGINX_RETRY_INTERVAL
             value: {{ .Values.exporter.nginx.nginx_retry_interval | quote }}
           args:
-          - --nginx.scrape-uri={{ .Values.exporter.nginx.scrape_uri | quote }}
+          - --nginx.scrape-uri={{ .Values.exporter.nginx.scrape_uri }}
           ports:
             - name: nginx-metrics
               containerPort: {{ .Values.exporter.nginx.port }}
