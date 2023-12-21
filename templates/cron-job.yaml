@@ -53,7 +53,9 @@ spec:
           {{- with $.Values.podAnnotations }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
+            {{- if $.Values.karpenter.optimization }}
             karpenter.sh/do-not-evict: "true"
+            {{- end }}
         spec:
         {{- with $.Values.imagePullSecrets }}
           imagePullSecrets:
@@ -132,13 +134,17 @@ spec:
               {{- end }}
           restartPolicy: {{ $cronvalue.restartPolicy | default "Never" }}
           nodeSelector:
-            {{- if $cronvalue.nodeSelector }}
+            {{- if $.Values.karpenter.optimization }}
+            {{- toYaml $.Values.karpenter.cron.nodeSelector | nindent 12 }}
+            {{- else if $cronvalue.nodeSelector }}
             {{- toYaml $cronvalue.nodeSelector | nindent 12 }}
             {{- else }}
             {{- toYaml $.Values.cron.nodeSelector | nindent 12 }}
             {{- end }}
           tolerations:
-            {{- if $cronvalue.tolerations }}
+            {{- if $.Values.karpenter.optimization }}
+            {{- toYaml $.Values.karpenter.cron.tolerations | nindent 12 }}
+            {{- else if $cronvalue.tolerations }}
             {{- toYaml $cronvalue.tolerations | nindent 12 }}
             {{- else }}
             {{- toYaml $.Values.cron.tolerations | nindent 12 }}

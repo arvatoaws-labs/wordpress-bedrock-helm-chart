@@ -73,7 +73,9 @@ spec:
   template:
     metadata:
       annotations:
+        {{- if $.Values.karpenter.optimization }}
         karpenter.sh/do-not-evict: "true"
+        {{- end }}
     spec:
       containers:
       - name: job-done
