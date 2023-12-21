@@ -63,9 +63,9 @@ efs:
   # extra Dirs not needed anymore
   extraDirs: []
 
-# add karpenter specific optimizations
+# add karpenter specific optimizations. Remember disabling the optimization when using this helm chart on a k8s cluster without karpenter!
 karpenter:
-  optimization: false
+  optimization: true
   cron:
     nodeSelector:
       karpenter.sh/nodepool: cron
@@ -313,8 +313,8 @@ hpa:
     serverAddress: http://prometheus-operated.monitoring.svc.cluster.local:9090
   maxReplicas: 10
   targets:
-    cpu: 70
-    memory: 70
+    cpu: 95
+    memory: 90
     php: 7
     nginx: 1000
 
