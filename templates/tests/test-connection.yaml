@@ -6,7 +6,9 @@ metadata:
 {{ include "wordpress-bedrock.labels" . | indent 4 }}
   annotations:
     "helm.sh/hook": test-success
-    "karpenter.sh/do-not-evict": "true"
+    {{- if $.Values.karpenter.optimization }}
+    karpenter.sh/do-not-disrupt: "true"
+    {{- end }}
 spec:
   containers:
     - name: wget

@@ -63,6 +63,18 @@ efs:
   # extra Dirs not needed anymore
   extraDirs: []
 
+# add karpenter specific optimizations
+karpenter:
+  optimization: false
+  cron:
+    nodeSelector:
+      karpenter.sh/nodepool: cron
+    tolerations:
+    - effect: NoSchedule
+      key: nodepool
+      operator: Equal
+      value: cron
+
 nginx:
   image:
     repository: public.ecr.aws/nginx/nginx
@@ -303,6 +315,7 @@ cron:
     requests:
       cpu: 50m
       memory: 128Mi
+  # karpenter.optimization will force overwrite nodeSelector and tolerations
   nodeSelector: {}
   tolerations: []
   php:
