@@ -106,6 +106,22 @@ nginx:
     runAsNonRoot: true
     runAsUser: 101
   extraVolumeMounts:  []
+  livenessProbe:
+    httpGet:
+      path: /nginx-status
+      port: http
+    failureThreshold: 3
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 1
+  readinessProbe:
+    httpGet:
+      path: /wp/wp-login.php
+      port: http
+    failureThreshold: 3
+    periodSeconds: 20
+    successThreshold: 1
+    timeoutSeconds: 3
 
 php:
   image:
