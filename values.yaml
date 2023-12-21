@@ -92,7 +92,9 @@ nginx:
   cache_control:
     expires: max
     js_css_enabled: true
-  accessLogEnabled: true
+  accessLog:
+    enabled: true
+    logUpstreamTime: true
   fastcgi_buffer_size: 16k
   fastcgi_buffers_number: 16
   fastcgi_buffers_size: 8k
@@ -130,7 +132,8 @@ php:
     pullPolicy: IfNotPresent
   resources: {}
   fpm:
-    accessLogEnabled: false
+    accessLog:
+      enabled: false
     pm:
       max_children: 10
       start_servers: 2
