@@ -45,7 +45,7 @@ spec:
             runAsUser: 0
           image: "{{ .Values.php.image.repository }}:{{ .Values.php.image.tag }}"
           imagePullPolicy: {{ .Values.php.image.pullPolicy }}
-          command: ['sh', '-c', 'cp -r /var/www/html/* /tmp && chown -R www-data:2000 /tmp']
+          command: ['sh', '-c', 'tar cf - . | (cd /tmp; tar xf -);chown -R www-data:2000 /tmp']
           volumeMounts:
           - name: web-volume
             mountPath: /tmp
