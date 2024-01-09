@@ -316,6 +316,10 @@ spec:
           matchLabels:
             app.kubernetes.io/instance: {{ .Release.Name }}
             app.kubernetes.io/component: "worker"
+        {{- if semverCompare ">=1.27-0" $.Capabilities.KubeVersion.GitVersion }}
+        matchLabelKeys:
+        - pod-template-hash
+        {{- end }}
         maxSkew: 1
         topologyKey: topology.kubernetes.io/zone
         whenUnsatisfiable: ScheduleAnyway
@@ -323,6 +327,10 @@ spec:
           matchLabels:
               app.kubernetes.io/instance: {{ .Release.Name }}
               app.kubernetes.io/component: "worker"
+        {{- if semverCompare ">=1.27-0" $.Capabilities.KubeVersion.GitVersion }}
+        matchLabelKeys:
+        - pod-template-hash
+        {{- end }}
         maxSkew: 1
         topologyKey: kubernetes.io/hostname
         whenUnsatisfiable: DoNotSchedule
