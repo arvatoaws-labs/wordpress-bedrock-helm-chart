@@ -60,6 +60,8 @@ efs:
   awsRegion: eu-central-1
   #storageClassName: efs
   storageClassName: efs-dynamic
+  # if set to true data from app docker image (specifically directories listed in php.extraVolumeMounts) will be force copied into particular efs subdirectories
+  copyFromImage: false
   # extra Dirs not needed anymore
   extraDirs: []
 

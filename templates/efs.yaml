@@ -14,4 +14,91 @@ spec:
     requests:
       storage: 5Gi
   storageClassName: {{ .Values.efs.storageClassName }}
+---
+{{- if .Values.efs.copyFromImage -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ $.Release.Name }}-efs-sync-hook
+  labels:
+{{ include "wordpress-bedrock.labels" $ | indent 4 }}
+    app.kubernetes.io/component: "hook"
+  annotations:
+    # This is what defines this resource as a hook. Without this line, the
+    # job is considered part of the release.
+    "helm.sh/hook-weight": "4"
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  ttlSecondsAfterFinished: 600
+  template:
+    metadata:
+      labels:
+        {{- include "wordpress-bedrock.selectorLabels" $ | nindent 8 }}
+        app.kubernetes.io/component: "hook"
+      {{- with $.Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      annotations:
+      {{- with $.Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+        {{- if $.Values.karpenter.optimization }}
+        karpenter.sh/do-not-disrupt: "true"
+        {{- end }}
+    spec:
+    {{- with $.Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      containers:
+      - name: job-done
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 65534
+        resources:
+          {{- toYaml $.Values.hooks.init.resources | nindent 10 }}
+        image: public.ecr.aws/runecast/busybox:1.33.1
+        command: ['sh', '-c', 'echo "all jobs completed"']
+      initContainers:
+      {{- range $key, $value := .Values.php.extraVolumeMounts }}
+      {{- if (contains "efs" $value.name ) }}
+      - name: {{ $value.subPath }}
+        image: "{{ $.Values.php.image.repository }}:{{ $.Values.php.image.tag }}"
+        imagePullPolicy: {{ $.Values.php.image.pullPolicy }}
+        command: ['sh', '-c', 'if [ -d "{{ $value.mountPath }}" ]; then cp -r {{ $value.mountPath }}/. /tmp && chown -R www-data:2000 /tmp; fi']
+        env:
+        - name: AWS_ZONE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['topology.kubernetes.io/zone']
+        volumeMounts:
+          - mountPath: /usr/local/etc/php/conf.d/hooks.ini
+            name: config-volume
+            subPath: hooks.ini
+            readOnly: true
+          - name: {{ $value.name }}
+            mountPath: /tmp
+            subPath: {{ $value.subPath }}
+            readOnly: {{ $value.readOnly }}
+      {{- end }}
+      {{- end }}
+      restartPolicy: Never
+      volumes:
+      - name: config-volume
+        configMap:
+          # Provide the name of the ConfigMap containing the files you want
+          # to add to the container
+          name: {{ include "wordpress-bedrock.fullname" $ }}
+      - name: efs
+        persistentVolumeClaim:
+          claimName: {{ $.Release.Name }}
+  backoffLimit: 1
+---
+{{- end -}}
 {{- end -}}
