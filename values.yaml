@@ -86,6 +86,7 @@ nginx:
   disallow_robots: false
   client_max_body_size: 10M
   cors_origins: []
+  header: {}
   rate_limit_login:
     enabled: false
     zone_memory_size: 10m
