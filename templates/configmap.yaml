@@ -164,6 +164,11 @@ data:
         }
         {{- end }}
 
+        # custom headers
+        {{- range $key, $value := $.Values.nginx.header }}
+        add_header {{ $key }} {{ $value }};
+        {{- end }}
+
         # default files forbidden due to version info
         location ~* /((package|package-lock)\.json|composer\.(json|lock)|changelog\.txt|readme\.(txt|html)|license\.(txt|html)|.*\.md)$ {
           return 403;
