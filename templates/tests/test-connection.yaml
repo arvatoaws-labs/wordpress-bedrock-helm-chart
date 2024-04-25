@@ -12,7 +12,7 @@ metadata:
 spec:
   containers:
     - name: wget
-      image: public.ecr.aws/library/busybox:1.33.1
+      image: public.ecr.aws/docker/library/busybox:1.36.1
       command: ['wget']
       args:  ['--spider', '{{ include "wordpress-bedrock.fullname" . }}-worker:{{ .Values.service.port }}/wp/wp-login.php']
       resources:
