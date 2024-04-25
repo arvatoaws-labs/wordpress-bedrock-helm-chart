@@ -68,14 +68,11 @@ efs:
 # add karpenter specific optimizations. Remember disabling the optimization when using this helm chart on a k8s cluster without karpenter!
 karpenter:
   optimization: true
+  # valid values for arch are "amd64", "arm64" or "" (empty). An empty value represents multi-arch support.
+  arch: amd64
   cron:
-    nodeSelector:
-      karpenter.sh/nodepool: cron
-    tolerations:
-    - effect: NoSchedule
-      key: nodepool
-      operator: Equal
-      value: cron
+    dedicatedNodePool: true
+    nodePoolPrefix: "cron-"
 
 nginx:
   image:
@@ -321,6 +318,7 @@ hpa:
     php: 7
     nginx: 1000
 
+# karpenter.optimization will force overwrite nodeSelector and tolerations
 nodeSelector: {}
 
 tolerations: []

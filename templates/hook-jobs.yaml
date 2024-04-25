@@ -110,6 +110,18 @@ spec:
           name: {{ include "wordpress-bedrock.fullname" $ }}
       - name: tmp-volume
         emptyDir: {}
+      {{- if $.Values.karpenter.optimization }}         
+      {{- include "wordpress-bedrock.archSelector" $ | trim | nindent 6 }}
+      {{- else }}
+      {{- with $.Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- end }}
   backoffLimit: 1
 ---
 {{- end }}

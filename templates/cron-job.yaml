@@ -133,22 +133,29 @@ spec:
               {{- toYaml $.Values.cron.resources | nindent 14 }}
               {{- end }}
           restartPolicy: {{ $cronvalue.restartPolicy | default "Never" }}
+          {{- if $.Values.karpenter.optimization }} 
+          {{- if $.Values.karpenter.cron.dedicatedNodePool }}  
+            {{- include "wordpress-bedrock.cronSelector" $ | trim | nindent 10 }}
+          {{- else }}
+            {{- include "wordpress-bedrock.archSelector" $ | trim | nindent 10 }}
+          {{- end }}
+          {{- else }}
+          {{- if $cronvalue.nodeSelector }}
           nodeSelector:
-            {{- if $.Values.karpenter.optimization }}
-            {{- toYaml $.Values.karpenter.cron.nodeSelector | nindent 12 }}
-            {{- else if $cronvalue.nodeSelector }}
             {{- toYaml $cronvalue.nodeSelector | nindent 12 }}
-            {{- else }}
+          {{- else if $.Values.cron.nodeSelector }}
+          nodeSelector:
             {{- toYaml $.Values.cron.nodeSelector | nindent 12 }}
-            {{- end }}
+          {{- end }}
+          {{- if $cronvalue.tolerations }}
           tolerations:
-            {{- if $.Values.karpenter.optimization }}
-            {{- toYaml $.Values.karpenter.cron.tolerations | nindent 12 }}
-            {{- else if $cronvalue.tolerations }}
             {{- toYaml $cronvalue.tolerations | nindent 12 }}
-            {{- else }}
+          {{- else if $.Values.cron.tolerations}}
+          tolerations:
             {{- toYaml $.Values.cron.tolerations | nindent 12 }}
-            {{- end }}
+          {{- end }}
+
+          {{- end }}
           volumes:
           - name: config-volume
             configMap:

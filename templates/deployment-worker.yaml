@@ -299,18 +299,22 @@ spec:
         persistentVolumeClaim:
           claimName: {{ $.Release.Name }}
 {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.karpenter.optimization }}         
+      {{- include "wordpress-bedrock.archSelector" . | trim | nindent 6 }}
+      {{- else }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-    {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
-    {{- with .Values.tolerations }}
+      {{- with .Values.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
-    {{- end }}
+      {{- end }}
+      {{- end }}
       topologySpreadConstraints:
       - labelSelector:
           matchLabels:
