@@ -56,7 +56,7 @@ Toleration and Node Selector for selecting dedicated arch nodes
 {{- define "wordpress-bedrock.archSelector" -}}
 {{- if eq .Values.karpenter.arch "arm64" }}
 nodeSelector:
-  karpenter.io/arch: {{ .Values.karpenter.arch }}
+  kubernetes.io/arch: {{ .Values.karpenter.arch }}
 {{- end }}
 {{- if not (eq .Values.karpenter.arch "amd64") }}
 tolerations:
