@@ -64,13 +64,6 @@ cron:
     requests:
       cpu: 50m
       memory: 128Mi
-  nodeSelector:
-    karpenter.sh/provisioner-name: cron
-  tolerations:
-  - effect: NoSchedule
-    key: provisioner
-    operator: Equal
-    value: cron
   php:
     memory_limit: 128M
   jobs:

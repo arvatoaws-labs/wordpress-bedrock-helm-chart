@@ -51,6 +51,36 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
+Toleration and Node Selector for selecting dedicated arch nodes
+*/}}
+{{- define "wordpress-bedrock.archSelector" -}}
+{{- if eq .Values.karpenter.arch "arm64" }}
+nodeSelector:
+  karpenter.io/arch: {{ .Values.karpenter.arch }}
+{{- end }}
+{{- if not (eq .Values.karpenter.arch "amd64") }}
+tolerations:
+- effect: NoSchedule
+  key: arch
+  operator: Equal
+  value: arm64
+{{- end }}
+{{- end }}
+
+{{/*
+Toleration and Node Selector for selecting dedicated cron nodes
+*/}}
+{{- define "wordpress-bedrock.cronSelector" -}}
+nodeSelector:
+  karpenter.sh/nodepool: {{ .Values.karpenter.cron.nodePoolPrefix }}{{ .Values.karpenter.arch | default "arm64" }}
+tolerations:
+- effect: NoSchedule
+  key: nodepool
+  operator: Equal
+  value: {{ .Values.karpenter.cron.nodePoolPrefix }}{{ .Values.karpenter.arch | default "arm64" }}
+{{- end }}
+
+{{/*
 Create the name of the service account to use
 */}}
 {{- define "wordpress-bedrock.serviceAccountName" -}}
