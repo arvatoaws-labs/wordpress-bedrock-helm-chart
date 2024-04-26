@@ -1,29 +1,37 @@
-apiVersion: v1
-kind: Pod
+apiVersion: batch/v1
+kind: Job
 metadata:
   name: "{{ include "wordpress-bedrock.fullname" . }}-test-connection"
   labels:
-{{ include "wordpress-bedrock.labels" . | indent 4 }}
+    {{- include "wordpress-bedrock.labels" . | nindent 4 }}
   annotations:
-    "helm.sh/hook": test-success
-    {{- if $.Values.karpenter.optimization }}
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": before-hook-creation
+    {{- if .Values.karpenter.optimization }}
     karpenter.sh/do-not-disrupt: "true"
     {{- end }}
 spec:
-  containers:
-    - name: wget
-      image: public.ecr.aws/docker/library/busybox:1.36.1
-      command: ['wget']
-      args:  ['--spider', '{{ include "wordpress-bedrock.fullname" . }}-worker:{{ .Values.service.port }}/wp/wp-login.php']
-      resources:
-        requests:
-          cpu: 0.01
-          memory: 32Mi
-      securityContext:
-        capabilities:
-          drop:
-          - ALL
-        readOnlyRootFilesystem: true
-        runAsNonRoot: true
-        runAsUser: 65534
-  restartPolicy: Never
+  ttlSecondsAfterFinished: 600
+  template:
+    metadata:
+      labels:
+        {{- include "wordpress-bedrock.labels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: wget
+          image: public.ecr.aws/docker/library/busybox:1.36.1
+          command: ['wget']
+          args:  ['--spider', '{{ include "wordpress-bedrock.fullname" . }}-worker:{{ .Values.service.port }}/wp/wp-login.php']
+          resources:
+            requests:
+              cpu: 0.01
+              memory: 32Mi
+          securityContext:
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 65534
+      restartPolicy: Never
+  backoffLimit: 0
