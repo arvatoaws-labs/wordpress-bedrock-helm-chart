@@ -236,7 +236,7 @@ data:
 
         location / {
             index  index.php index.html index.htm;
-            try_files $uri $uri/ /index.php?path=$uri&$args;
+            try_files $uri $uri/ /index.php?$args;
         }
 
         # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
