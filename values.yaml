@@ -77,7 +77,7 @@ karpenter:
 nginx:
   image:
     repository: public.ecr.aws/nginx/nginx
-    tag: 1.26
+    tag: 1.27
     pullPolicy: IfNotPresent
   resources: {}
   disallow_robots: false
