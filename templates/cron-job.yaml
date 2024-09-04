@@ -40,6 +40,9 @@ spec:
   jobTemplate:
     spec:
       backoffLimit: {{ $cronvalue.backoffLimit | default 0 }}
+      {{- if $cronvalue.ttlSecondsAfterFinished }}
+      ttlSecondsAfterFinished : {{ $cronvalue.ttlSecondsAfterFinished }}
+      {{- end }}
       template:
         metadata:
           labels:

@@ -362,3 +362,4 @@ cron:
       concurrencyPolicy: Replace
       restartPolicy: OnFailure
       startingDeadlineSeconds: 1800
+      ttlSecondsAfterFinished: 600
