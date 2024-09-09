@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: "{{ include "wordpress-bedrock.fullname" . }}-test-connection"
+  name: "{{ include "wordpress-bedrock.fullname" $ | trunc 47 | trimSuffix "-" }}-test-connection"
   labels:
     {{- include "wordpress-bedrock.labels" . | nindent 4 }}
   annotations:
