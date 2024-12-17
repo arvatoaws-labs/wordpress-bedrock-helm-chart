@@ -314,7 +314,7 @@ hpa:
   maxReplicas: 10
   targets:
     cpu: 95
-    memory: 90
+    # memory: 90
     php: 7
     nginx: 1000
 
