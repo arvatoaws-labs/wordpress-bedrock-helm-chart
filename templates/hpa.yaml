@@ -64,10 +64,12 @@ spec:
     metadata:
       type: Utilization
       value: "{{ .Values.hpa.targets.cpu }}"
+  {{- if .Values.hpa.targets.memory }}
   - type: memory
     metadata:
       type: Utilization
       value: "{{ .Values.hpa.targets.memory }}"
+  {{- end }}
   - type: prometheus
     metadata:
       serverAddress: "{{ .Values.hpa.prometheus.serverAddress }}"

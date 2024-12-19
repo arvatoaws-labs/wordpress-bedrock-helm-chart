@@ -33,6 +33,10 @@ securityContext: {}
 service:
   type: ClusterIP
   port: 80
+  testConnection:
+    # url: # defaults to service.name:service.port/wp/wp-login.php
+    timeout: 60
+    interval: 5
 
 ingress:
   enabled: false
@@ -314,7 +318,7 @@ hpa:
   maxReplicas: 10
   targets:
     cpu: 95
-    memory: 90
+    # memory: 90
     php: 7
     nginx: 1000
 

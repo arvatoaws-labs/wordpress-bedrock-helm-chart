@@ -20,8 +20,7 @@ spec:
       containers:
         - name: wget
           image: public.ecr.aws/docker/library/busybox:1.36.1
-          command: ['wget']
-          args:  ['--spider', '{{ include "wordpress-bedrock.fullname" . }}-worker:{{ .Values.service.port }}/wp/wp-login.php']
+          command: ['sh', '-c', '/tmp/test.sh']
           resources:
             requests:
               cpu: 0.01
@@ -33,5 +32,28 @@ spec:
             readOnlyRootFilesystem: true
             runAsNonRoot: true
             runAsUser: 65534
+          env:
+          - name: TEST_URL
+          {{- if .Values.service.testConnection.url }}
+            value: {{ .Values.service.testConnection.url | quote }}
+          {{- else }}
+            value: {{ include "wordpress-bedrock.fullname" $ }}-worker:{{ .Values.service.port }}/wp/wp-login.php
+          {{- end }}
+          - name: TEST_TIMEOUT
+            value: {{ .Values.service.testConnection.timeout | quote }}
+          - name: TEST_INTERVAL
+            value: {{ .Values.service.testConnection.interval | quote }}
+          volumeMounts:
+          - mountPath: /tmp/test.sh
+            name: config-volume
+            subPath: test.sh
+            readOnly: true
       restartPolicy: Never
+      volumes:
+      - name: config-volume
+        configMap:
+          # Provide the name of the ConfigMap containing the files you want
+          # to add to the container
+          name: {{ include "wordpress-bedrock.fullname" $ }}
+          defaultMode: 0777
   backoffLimit: 0
