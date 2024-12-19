@@ -33,6 +33,10 @@ securityContext: {}
 service:
   type: ClusterIP
   port: 80
+  testConnection:
+    # url: # defaults to service.name:service.port/wp/wp-login.php
+    timeout: 60
+    interval: 5
 
 ingress:
   enabled: false
