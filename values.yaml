@@ -178,6 +178,11 @@ offload:
     enabled: false
     filePath: /var/local/
     fileName: wpoffload_private.pem
+  errorPages:
+    enabled: false
+    image: public.ecr.aws/aws-cli/aws-cli:2.27.14
+    path: /var/www/html/error-pages
+
 
 # these plugins will be activated using the activate-wp-plugins hook
 plugins:
