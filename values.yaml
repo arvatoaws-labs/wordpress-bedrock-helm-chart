@@ -259,8 +259,8 @@ init:
 exporter:
   nginx:
     image:
-      repository: ghcr.io/arvatoaws-labs/nginx-exporter
-      tag: 1.0.0
+      repository: public.ecr.aws/nginx/nginx-prometheus-exporter
+      tag: 1.4.1
       pullPolicy: IfNotPresent
     port: 9113
     telemetry_path: /metrics
