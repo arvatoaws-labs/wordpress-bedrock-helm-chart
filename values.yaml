@@ -260,7 +260,7 @@ exporter:
   nginx:
     image:
       repository: public.ecr.aws/nginx/nginx-prometheus-exporter
-      tag: 1.4.1
+      tag: 1.4.2
       pullPolicy: IfNotPresent
     port: 9113
     telemetry_path: /metrics
