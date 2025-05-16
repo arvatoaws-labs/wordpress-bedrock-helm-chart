@@ -35,6 +35,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+      serviceAccountName: {{ template "wordpress-bedrock.serviceAccountName" $ }}
       containers:
       - name: job-done
         securityContext:
@@ -100,6 +101,50 @@ spec:
             subPath: hooks.ini
             readOnly: true
       {{- end }}
+      {{- end }}
+      {{- if and ($.Values.offload.errorPages.enabled) ( or (eq $hooktype "post-install") (eq $hooktype "post-upgrade")) }}
+      - name: prepare-error-pages
+        image: "{{ $.Values.php.image.repository }}:{{ $.Values.php.image.tag }}"
+        imagePullPolicy: {{ $.Values.php.image.pullPolicy }}
+        command:
+        - /bin/sh
+        - -c
+        - |
+          if [ -d "{{ $.Values.offload.errorPages.path }}" ] && [ -f "{{ $.Values.offload.errorPages.path }}/sorry.html" ]; then
+            echo "Prepare volume with error-pages..."
+            mkdir -p /tmp/error-pages
+            cp -r {{ $.Values.offload.errorPages.path }}/* /tmp/error-pages/
+          else
+            echo "Directory {{ $.Values.offload.errorPages.path }} does not exist or sorry.html is missing. Skipping sync."
+          fi
+        volumeMounts:
+          - name: tmp-volume
+            mountPath: /tmp
+            readOnly: false
+      - name: deploy-error-pages
+        image: "{{ $.Values.offload.errorPages.image }}"
+        imagePullPolicy: {{ $.Values.php.image.pullPolicy }}
+        command:
+        - /bin/sh
+        - -c
+        - |
+          if [ -d "/tmp/error-pages" ] && [ -f "/tmp/error-pages/sorry.html" ] && [ -n $WP_OFFLOAD_BUCKET ]; then
+            echo "Syncing error-pages to S3 bucket $WP_OFFLOAD_BUCKET..."
+            aws s3 sync "/tmp/error-pages" "s3://$WP_OFFLOAD_BUCKET/error-pages"
+          else
+            echo "Directory {{ $.Values.offload.errorPages.path }} does not exist or sorry.html is missing. Skipping sync."
+          fi
+        env:
+        {{- if $.Values.offload.bucket }}
+        - name: WP_OFFLOAD_BUCKET
+          value: {{ $.Values.offload.bucket | quote }}
+        - name: WP_OFFLOAD_REGION
+          value: {{ $.Values.offload.region | quote }}
+        {{- end }}
+        volumeMounts:
+          - name: tmp-volume
+            mountPath: /tmp
+            readOnly: true
       {{- end }}
       restartPolicy: Never
       volumes:
