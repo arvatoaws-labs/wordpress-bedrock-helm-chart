@@ -35,7 +35,9 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+      {{- if and ($.Values.offload.errorPages.enabled) ( or (eq $hooktype "post-install") (eq $hooktype "post-upgrade")) }}
       serviceAccountName: {{ template "wordpress-bedrock.serviceAccountName" $ }}
+      {{- end }}
       containers:
       - name: job-done
         securityContext:
