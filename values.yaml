@@ -180,7 +180,7 @@ offload:
     fileName: wpoffload_private.pem
   errorPages:
     enabled: false
-    image: public.ecr.aws/aws-cli/aws-cli:2.28.18
+    image: public.ecr.aws/aws-cli/aws-cli:2.28.22
     path: /var/www/html/error-pages
 
 
