@@ -317,7 +317,7 @@ exporter:
 
 hpa:
   enabled: true
-  engine: keda # prometheus-adapter
+  engine: keda
   prometheus:
     serverAddress: http://prometheus-operated.monitoring.svc.cluster.local:9090
   maxReplicas: 10
@@ -326,6 +326,12 @@ hpa:
     # memory: 90
     php: 7
     nginx: 1000
+  httpAddon:
+    enabled: false
+    concurrency: 10
+    service:
+      name: keda-add-ons-http-interceptor-proxy
+      port: 8080
 
 # karpenter.optimization will force overwrite nodeSelector and tolerations
 nodeSelector: {}

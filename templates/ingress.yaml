@@ -1,10 +1,14 @@
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "wordpress-bedrock.fullname" . -}}
 {{- $svcPort := .Values.service.port -}}
+{{- $httpAddon := .Values.hpa.httpAddon -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ $fullName }}
+  {{- if and .Values.hpa .Values.hpa.httpAddon .Values.hpa.httpAddon.enabled }}
+  namespace: keda
+  {{- end }}
   labels:
     {{- include "wordpress-bedrock.labels" . | nindent 4 }}
   {{- with .Values.ingress.annotations }}
@@ -30,6 +34,15 @@ spec:
     - host: {{ .host | quote }}
       http:
         paths:
+          {{- if $httpAddon.enabled }}
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $httpAddon.service.name }}
+                port:
+                  number: {{ $httpAddon.service.port }}
+          {{- else }}
           {{- range .paths }}
           - path: {{ .path }}
             {{- if .pathType }}
@@ -47,7 +60,9 @@ spec:
               service:
                 name: {{ $fullName }}-worker
                 port:
-                  number: {{ $svcPort }}
+                  number: {{ $svcPort }}                  
           {{- end }}
+          {{- end }}
+
     {{- end }}
 {{- end }}

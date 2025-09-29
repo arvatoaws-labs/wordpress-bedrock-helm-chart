@@ -1,0 +1,27 @@
+{{- if .Values.hpa.httpAddon.enabled }}
+kind: HTTPScaledObject
+apiVersion: http.keda.sh/v1alpha1
+metadata:
+  name: {{ include "wordpress-bedrock.fullname" . }}
+  labels:
+{{ include "wordpress-bedrock.labels" . | indent 4 }}
+spec:
+    hosts:
+        {{- range .Values.ingress.hosts }}
+        - {{ .host | quote }}
+        {{- end }}
+    pathPrefixes:
+        - /
+    scalingMetric:
+        concurrency:
+            targetValue: {{ .Values.hpa.httpAddon.concurrency }}
+    scaleTargetRef:
+        name: {{ include "wordpress-bedrock.fullname" . }}-worker
+        kind: Deployment
+        apiVersion: apps/v1
+        service: {{ include "wordpress-bedrock.fullname" . }}-worker
+        port: {{ .Values.service.port }}
+    replicas:
+        min: 0
+        max: {{ .Values.hpa.maxReplicas }}
+{{- end }}
