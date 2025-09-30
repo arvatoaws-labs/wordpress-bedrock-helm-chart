@@ -53,7 +53,7 @@ jobs:
           git config --global user.email '${{ vars.APP_ID }}+buildandpublish[bot]@users.noreply.github.com'
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
 
       - name: Install helm
         run: |
