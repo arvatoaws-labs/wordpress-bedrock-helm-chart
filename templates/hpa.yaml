@@ -1,47 +1,6 @@
-{{- if .Values.hpa.enabled }}
-{{- if eq .Values.hpa.engine "prometheus-adapter" }}
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: {{ include "wordpress-bedrock.fullname" . }}
-  labels:
-{{ include "wordpress-bedrock.labels" . | indent 4 }}
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: {{ include "wordpress-bedrock.fullname" . }}-worker
-  maxReplicas: {{ .Values.hpa.maxReplicas }}
-  minReplicas: {{ .Values.replicaCount }}
-  metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: {{ .Values.hpa.targets.cpu }}
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        averageUtilization: {{ .Values.hpa.targets.memory }}
-        type: Utilization
-  - type: Pods
-    pods:
-      metric:
-        name: phpfpm_active_processes
-      target:
-        type: AverageValue
-        averageValue: {{ .Values.hpa.targets.php }}
-  - type: Pods
-    pods:
-      metric:
-        name: nginx_connections_active
-      target:
-        type: AverageValue
-        averageValue: {{ .Values.hpa.targets.nginx }}
-{{- end }}
+{{- if and .Values.hpa .Values.hpa.enabled .Values.hpa.httpAddon (not .Values.hpa.httpAddon.enabled) }}
 {{- if eq .Values.hpa.engine "keda" }}
+
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
