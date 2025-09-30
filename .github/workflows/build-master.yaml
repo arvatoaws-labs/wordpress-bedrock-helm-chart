@@ -63,7 +63,7 @@ jobs:
           rm -rf helm-${HELM_VERSION}-linux-amd64.tar.gz linux-amd64
 
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
