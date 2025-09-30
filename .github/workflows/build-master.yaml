@@ -1,0 +1,175 @@
+name: Build and Publish Helm Chart on Master Branch
+
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - "Chart.yaml"
+      - "CHANGELOG.md"
+
+jobs:
+  validate:
+    uses: ./.github/workflows/validate.yaml
+    secrets: inherit
+
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write # Needed to update the Chart.yaml file
+      packages: write
+
+    env:
+      HELM_VERSION: v3.19.0
+
+    steps:
+      # Generate a GitHub App installation token
+      - name: Generate a token
+        id: generate-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Use the token
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+        run: |
+          gh api octocat
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          ref: ${{ github.ref }}
+          token: ${{ steps.generate-token.outputs.token }}
+
+      - name: Set Committer
+        run: |
+          git config --global --add safe.directory $GITHUB_WORKSPACE
+          git config --global user.name 'buildandpublish[bot]'
+          git config --global user.email '${{ vars.APP_ID }}+buildandpublish[bot]@users.noreply.github.com'
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Install helm
+        run: |
+          wget -q https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz
+          tar -zxvf helm-${HELM_VERSION}-linux-amd64.tar.gz
+          sudo mv linux-amd64/helm /usr/local/bin/helm
+          rm -rf helm-${HELM_VERSION}-linux-amd64.tar.gz linux-amd64
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run helm show chart
+        run: |
+          helm show chart .
+
+      - name: Run helm lint
+        run: |
+          helm lint .
+
+      - name: Commit Updated linted files
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git add -A
+            git commit -m "Linted files"
+            git push
+          else
+            echo "No changes to commit."
+          fi
+
+      - name: Read and Increment Version in Chart.yaml
+        id: versioning
+        run: |
+          # Read the current version from Chart.yaml
+          current_version=$(grep '^version:' Chart.yaml | awk '{print $2}')
+
+          # Extract commit messages since the last tag, fallback to all commits if no tags exist
+          last_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -z "$last_tag" ]; then
+            echo "No tags found, using all commits."
+            commit_messages=$(git log --pretty=format:"%s")
+          else
+            commit_messages=$(git log --pretty=format:"%s" $last_tag..HEAD)
+          fi
+
+          # Determine the version bump type based on Conventional Commits
+          bump_type="patch"
+          if echo "$commit_messages" | grep -qE '^feat'; then
+            bump_type="minor"
+          fi
+          if echo "$commit_messages" | grep -qE '^BREAKING CHANGE|!:'; then
+            bump_type="major"
+          fi
+
+          # Increment the version based on the bump type
+          IFS='.' read -r major minor patch <<< "$current_version"
+          case $bump_type in
+            patch)
+              echo "Bugfix detected, incrementing patch version!"
+              patch=$((patch + 1))
+              ;;
+            minor)
+              echo "Feature detected, incrementing minor version!"
+              minor=$((minor + 1))
+              patch=0
+              ;;
+            major)
+              echo "Breaking changes detected, incrementing major version!"
+              major=$((major + 1))
+              minor=0
+              patch=0
+              ;;
+          esac
+          new_version="$major.$minor.$patch"
+
+          # Update the version in Chart.yaml
+          sed -i "s/^version: .*/version: $new_version/" Chart.yaml
+
+          # Output the new version for later steps
+          echo "new_version=$new_version" >> $GITHUB_ENV
+          echo "New version: $new_version"
+
+      - name: Commit Updated Chart.yaml
+        run: |
+          git add Chart.yaml
+          git commit -m "Increment chart version to ${{ env.new_version }}"
+          git push
+
+      - name: Run helm show chart
+        run: |
+          helm show chart .
+
+      - name: Package Helm Chart
+        run: |
+          helm package . --destination ./charts
+
+      - name: Listing Helm Charts
+        run: |
+          ls -l ./charts
+
+      - name: Push Helm Chart to GHCR
+        run: |
+          helm push ./charts/*.tgz oci://ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: "v${{ env.new_version }}"
+          release_name: "Helm Chart Release v${{ env.new_version }}"
+          body: |
+            This release includes the Helm chart version v${{ env.new_version }}.
+          draft: false
+          prerelease: false

@@ -51,6 +51,8 @@ env:
 
 hpa:
   engine: keda
+  httpAddon:
+    enabled: true
 
 ingress:
   enabled: true

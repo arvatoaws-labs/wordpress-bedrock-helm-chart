@@ -1,0 +1,48 @@
+name: Validate
+
+on:
+  #push:
+  #  branches:
+  #    - master
+  #    - develop
+  pull_request:
+    branches:
+      - master
+      - develop
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  verify-chart:
+    runs-on: ubuntu-latest
+
+    env:
+      HELM_VERSION: v3.19.0
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install helm
+        run: |
+          wget https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz
+          tar -zxvf helm-${HELM_VERSION}-linux-amd64.tar.gz
+          sudo mv linux-amd64/helm /usr/local/bin/helm
+          rm -rf helm-${HELM_VERSION}-linux-amd64.tar.gz linux-amd64
+
+      - name: Run helm show chart
+        run: |
+          helm show chart .
+
+      - name: Run helm lint
+        run: |
+          helm lint .
+
+      - name: Run helm template
+        run: |
+          helm template .
+
+      - name: Run helm template with test values
+        run: |
+          helm template . -f ./values_test.yaml
+
