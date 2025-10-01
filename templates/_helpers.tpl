@@ -92,8 +92,23 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
-Expand the name of the chart.
+Create efs sub path.
 */}}
 {{- define "wordpress-bedrock.efsSubPath" -}}
 {{- default .Release.Name .Values.efs.subPath | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
+
+{{/*
+Create test url.
+*/}}
+{{- define "wordpress-bedrock.testUrl" -}}
+{{- if .Values.service.testConnection.url }}
+{{- .Values.service.testConnection.url }}
+{{- else }}
+{{- if and .Values.ingress.hosts (gt (len .Values.ingress.hosts) 0) }}
+{{- (printf "https://%s/wp/wp-login.php" (index .Values.ingress.hosts 0).host) | lower }}
+{{- else }}
+{{ include "wordpress-bedrock.fullname" . }}-worker:{{ .Values.service.port }}/wp/wp-login.php
+{{- end }}
+{{- end }}
+{{- end }}

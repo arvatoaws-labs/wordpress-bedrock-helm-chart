@@ -50,7 +50,7 @@ ingress:
     - host: chart-example.local
       paths:
         - path: /
-          pathType: ImplementationSpecific
+          pathType: Prefix
 
   tls: []
   #  - secretName: chart-example-tls
@@ -180,7 +180,7 @@ offload:
     fileName: wpoffload_private.pem
   errorPages:
     enabled: false
-    image: public.ecr.aws/aws-cli/aws-cli:2.31.4
+    image: public.ecr.aws/aws-cli/aws-cli:2.31.5
     path: /var/www/html/error-pages
 
 
