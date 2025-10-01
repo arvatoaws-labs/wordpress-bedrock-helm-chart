@@ -103,7 +103,7 @@ Crate test url.
 */}}
 {{- define "wordpress-bedrock.testUrl" -}}
 {{- if .Values.service.testConnection.url }}
-{{- .Values.testConnection.url }}
+{{- .Values.service.testConnection.url }}
 {{- else }}
 {{- (printf "https://%s/wp/wp-login.php" (index .Values.ingress.hosts 0).host) | lower }}
 {{- end }}
