@@ -97,3 +97,14 @@ Expand the name of the chart.
 {{- define "wordpress-bedrock.efsSubPath" -}}
 {{- default .Release.Name .Values.efs.subPath | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
+
+{{/*
+Expand the name of the chart.
+*/}}
+{{- define "wordpress-bedrock.testUrl" -}}
+{{- if .Values.service.testConnection.url }}
+{{- .Values.testConnection.url }}
+{{- else }}
+{{- (printf "https://%s/wp/wp-login.php" (index .Values.ingress.hosts 0).host) | lower }}
+{{- end }}
+{{- end }}

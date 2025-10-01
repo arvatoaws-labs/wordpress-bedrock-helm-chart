@@ -34,11 +34,7 @@ spec:
             runAsUser: 65534
           env:
           - name: TEST_URL
-          {{- if .Values.service.testConnection.url }}
-            value: {{ .Values.service.testConnection.url | quote }}
-          {{- else }}
-            value: {{ include "wordpress-bedrock.fullname" $ }}-worker:{{ .Values.service.port }}/wp/wp-login.php
-          {{- end }}
+            value: {{ include "wordpress-bedrock.testUrl" $ | quote }}
           - name: TEST_TIMEOUT
             value: {{ .Values.service.testConnection.timeout | quote }}
           - name: TEST_INTERVAL

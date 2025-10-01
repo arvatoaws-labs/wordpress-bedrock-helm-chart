@@ -49,7 +49,7 @@ ingress:
   hosts:
     - host: chart-example.local
       paths:
-        - path: /
+        - path: /*
           pathType: ImplementationSpecific
 
   tls: []
