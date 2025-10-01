@@ -92,14 +92,14 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
-Expand the name of the chart.
+Create efs sub path.
 */}}
 {{- define "wordpress-bedrock.efsSubPath" -}}
 {{- default .Release.Name .Values.efs.subPath | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
-Expand the name of the chart.
+Crate test url.
 */}}
 {{- define "wordpress-bedrock.testUrl" -}}
 {{- if .Values.service.testConnection.url }}
