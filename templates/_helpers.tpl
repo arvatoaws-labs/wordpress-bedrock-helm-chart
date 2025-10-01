@@ -99,7 +99,7 @@ Create efs sub path.
 {{- end -}}
 
 {{/*
-Crate test url.
+Create test url.
 */}}
 {{- define "wordpress-bedrock.testUrl" -}}
 {{- if .Values.service.testConnection.url }}
