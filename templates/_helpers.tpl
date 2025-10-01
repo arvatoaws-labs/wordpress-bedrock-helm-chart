@@ -105,6 +105,10 @@ Create test url.
 {{- if .Values.service.testConnection.url }}
 {{- .Values.service.testConnection.url }}
 {{- else }}
+{{- if and .Values.ingress.hosts (gt (len .Values.ingress.hosts) 0) }}
 {{- (printf "https://%s/wp/wp-login.php" (index .Values.ingress.hosts 0).host) | lower }}
+{{- else }}
+{{ include "wordpress-bedrock.fullname" $ }}-worker:{{ .Values.service.port }}/wp/wp-login.php
+{{- end }}
 {{- end }}
 {{- end }}
