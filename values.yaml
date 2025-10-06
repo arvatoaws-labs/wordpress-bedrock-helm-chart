@@ -329,6 +329,7 @@ hpa:
   httpAddon:
     enabled: false
     concurrency: 10
+    scaledownPeriod: 3600
     service:
       name: keda-add-ons-http-interceptor-proxy
       port: 8080
