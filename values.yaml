@@ -81,7 +81,7 @@ karpenter:
 nginx:
   image:
     repository: public.ecr.aws/nginx/nginx
-    tag: 1.28.0-alpine-slim
+    tag: 1.29.2-alpine-slim
     pullPolicy: IfNotPresent
   resources: {}
   disallow_robots: false
@@ -180,7 +180,7 @@ offload:
     fileName: wpoffload_private.pem
   errorPages:
     enabled: false
-    image: public.ecr.aws/aws-cli/aws-cli:2.31.5
+    image: public.ecr.aws/aws-cli/aws-cli:2.31.11
     path: /var/www/html/error-pages
 
 
@@ -329,6 +329,7 @@ hpa:
   httpAddon:
     enabled: false
     concurrency: 10
+    scaledownPeriod: 3600
     service:
       name: keda-add-ons-http-interceptor-proxy
       port: 8080

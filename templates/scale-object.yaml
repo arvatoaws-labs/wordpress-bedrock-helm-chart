@@ -24,4 +24,5 @@ spec:
     replicas:
         min: 0
         max: {{ .Values.hpa.maxReplicas }}
+    scaledownPeriod: {{ .Values.hpa.httpAddon.scaledownPeriod }}
 {{- end }}
