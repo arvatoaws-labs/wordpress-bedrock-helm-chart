@@ -1,5 +1,93 @@
 {
   "extends": [
     "config:base"
+  ],
+  "enabled": true,
+  "suppressNotifications": [
+    "prIgnoreNotification"
+  ],
+  "rebaseWhen": "conflicted",
+  "packageRules": [
+    {
+      "matchDatasources": [
+        "docker"
+      ],
+      "enabled": true,
+      "commitMessageTopic": "container image {{depName}}",
+      "commitMessageExtra": "to {{#if isSingleVersion}}v{{{newVersion}}}{{else}}{{{newValue}}}{{/if}}",
+      "matchUpdateTypes": [
+        "major",
+        "minor",
+        "patch"
+      ]
+    },
+    {
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "labels": [
+        "renovate/image",
+        "dep/major"
+      ]
+    },
+    {
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchUpdateTypes": [
+        "minor"
+      ],
+      "labels": [
+        "renovate/image",
+        "dep/minor"
+      ]
+    },
+    {
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "labels": [
+        "renovate/image",
+        "dep/patch"
+      ]
+    },
+    {
+      "matchDatasources": [
+        "docker"
+      ],
+      "automerge": true,
+      "automergeType": "branch",
+      "requiredStatusChecks": null,
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "matchPackageNames": [
+        "public.ecr.aws/aws-cli/aws-cli"
+      ]
+    },
+    {
+      "matchDatasources": [
+        "docker"
+      ],
+      "automerge": true,
+      "automergeType": "branch",
+      "requiredStatusChecks": null,
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "matchPackageNames": [
+        "ghcr.io/arvatoaws-labs/php",
+        "public.ecr.aws/nginx/nginx",
+        "ghcr.io/arvatoaws-labs/hipages/php-fpm_exporter",
+        "public.ecr.aws/nginx/nginx-prometheus-exporter"
+      ]
+    }
   ]
 }
