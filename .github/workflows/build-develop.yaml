@@ -36,7 +36,7 @@ jobs:
         run: |
           wget -q https://get.helm.sh/helm-${HELM_VERSION}-linux-arm64.tar.gz
           tar -zxvf helm-${HELM_VERSION}-linux-arm64.tar.gz
-          sudo mv linux-amd64/helm /usr/local/bin/helm
+          sudo mv linux-arm64/helm /usr/local/bin/helm
           rm -rf helm-${HELM_VERSION}-linux-arm64.tar.gz linux-arm64
 
       - name: Log in to GitHub Container Registry
