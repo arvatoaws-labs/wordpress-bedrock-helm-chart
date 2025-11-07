@@ -11,7 +11,7 @@ jobs:
     secrets: inherit
 
   build-and-push:
-    runs-on: ubuntu-latest
+    runs-on: arvato
     permissions:
       id-token: write
       contents: write  # Needed to update the VERSION file
@@ -34,10 +34,10 @@ jobs:
 
       - name: Install helm
         run: |
-          wget -q https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz
-          tar -zxvf helm-${HELM_VERSION}-linux-amd64.tar.gz
-          sudo mv linux-amd64/helm /usr/local/bin/helm
-          rm -rf helm-${HELM_VERSION}-linux-amd64.tar.gz linux-amd64
+          wget -q https://get.helm.sh/helm-${HELM_VERSION}-linux-arm64.tar.gz
+          tar -zxvf helm-${HELM_VERSION}-linux-arm64.tar.gz
+          sudo mv linux-arm64/helm /usr/local/bin/helm
+          rm -rf helm-${HELM_VERSION}-linux-arm64.tar.gz linux-arm64
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
