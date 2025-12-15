@@ -14,7 +14,7 @@ metadata:
     {{- end }}
     checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") $ | sha256sum }}
     {{- if $.Values.automaticZonePlacement.enabled }}
-    automatic-zone-placement/fqdn: {{ $.Values.automaticZonePlacement.fqdn }}
+    automatic-zone-placement/fqdn: {{ $.Values.automaticZonePlacement.fqdn | quote }}
     {{- end }}
 spec:
   {{- $schedule := dig "schedule" "" $cronvalue }}
