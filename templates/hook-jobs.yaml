@@ -30,6 +30,9 @@ spec:
         {{- if $.Values.karpenter.optimization }}
         karpenter.sh/do-not-disrupt: "true"
         {{- end }}
+        {{- if $.Values.automaticZonePlacement.enabled }}
+        automatic-zone-placement/fqdn: {{ $.Values.automaticZonePlacement.fqdn }}
+        {{- end }}
     spec:
     {{- with $.Values.imagePullSecrets }}
       imagePullSecrets:

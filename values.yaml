@@ -379,3 +379,8 @@ cron:
       restartPolicy: OnFailure
       startingDeadlineSeconds: 1800
       ttlSecondsAfterFinished: 600
+
+automaticZonePlacement:
+  enabled: false
+  spreadInstancesTypes: false
+  fqdn: ""

@@ -26,6 +26,9 @@ spec:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
         checksum/secret: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
+        {{- if .Values.automaticZonePlacement.enabled }}
+        automatic-zone-placement/fqdn: {{ .Values.automaticZonePlacement.fqdn }}
+        {{- end }}
       {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -316,25 +319,35 @@ spec:
       {{- end }}
       {{- end }}
       topologySpreadConstraints:
+{{- if .Values.automaticZonePlacement.enabled }}
+{{- if .Values.automaticZonePlacement.spreadInstancesTypes }}
       - labelSelector:
           matchLabels:
             app.kubernetes.io/instance: {{ .Release.Name }}
             app.kubernetes.io/component: "worker"
-        {{- if semverCompare ">=1.27-0" $.Capabilities.KubeVersion.GitVersion }}
         matchLabelKeys:
         - pod-template-hash
-        {{- end }}
+        maxSkew: 1
+        topologyKey: node.kubernetes.io/instance-type
+        whenUnsatisfiable: ScheduleAnyway
+{{- end }}
+{{- else }}
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/instance: {{ .Release.Name }}
+            app.kubernetes.io/component: "worker"
+        matchLabelKeys:
+        - pod-template-hash
         maxSkew: 1
         topologyKey: topology.kubernetes.io/zone
         whenUnsatisfiable: ScheduleAnyway
+{{- end }}
       - labelSelector:
           matchLabels:
               app.kubernetes.io/instance: {{ .Release.Name }}
               app.kubernetes.io/component: "worker"
-        {{- if semverCompare ">=1.27-0" $.Capabilities.KubeVersion.GitVersion }}
         matchLabelKeys:
         - pod-template-hash
-        {{- end }}
         maxSkew: 1
         topologyKey: kubernetes.io/hostname
         whenUnsatisfiable: DoNotSchedule

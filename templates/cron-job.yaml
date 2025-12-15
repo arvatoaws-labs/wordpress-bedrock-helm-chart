@@ -13,6 +13,9 @@ metadata:
     downscaler/uptime: {{ $.Values.wordpress.uptime }}
     {{- end }}
     checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") $ | sha256sum }}
+    {{- if $.Values.automaticZonePlacement.enabled }}
+    automatic-zone-placement/fqdn: {{ $.Values.automaticZonePlacement.fqdn }}
+    {{- end }}
 spec:
   {{- $schedule := dig "schedule" "" $cronvalue }}
   {{- $scheduleEveryHrs := dig "scheduleEveryHrs" "" $cronvalue }}
