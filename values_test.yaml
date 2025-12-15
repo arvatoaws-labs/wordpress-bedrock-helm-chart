@@ -102,3 +102,8 @@ serviceAccount:
   # If not set and create is true, a name is generated using the release name
   name: test-project
   iamRoleArn: arn:aws:iam::123456789012:role/test-project-role
+
+automaticZonePlacement:
+  enabled: true
+  spreadInstancesTypes: false
+  fqdn: wordpress.rds.cloud.internal
