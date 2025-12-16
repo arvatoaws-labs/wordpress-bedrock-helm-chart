@@ -20,13 +20,13 @@ spec:
   maxReplicaCount: {{ .Values.hpa.maxReplicas }}
   triggers:
   - type: cpu
+    metricType: Utilization
     metadata:
-      type: Utilization
       value: "{{ .Values.hpa.targets.cpu }}"
   {{- if .Values.hpa.targets.memory }}
   - type: memory
+    metricType: Utilization
     metadata:
-      type: Utilization
       value: "{{ .Values.hpa.targets.memory }}"
   {{- end }}
   - type: prometheus
