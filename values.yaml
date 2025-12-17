@@ -180,7 +180,7 @@ offload:
     fileName: wpoffload_private.pem
   errorPages:
     enabled: false
-    image: public.ecr.aws/aws-cli/aws-cli:2.32.17
+    image: public.ecr.aws/aws-cli/aws-cli:2.32.18
     path: /var/www/html/error-pages
 
 
@@ -383,4 +383,4 @@ cron:
 automaticZonePlacement:
   enabled: false
   spreadInstancesTypes: false
-  fqdn: ""
+  fqdn: "wordpress.rds.cloud.internal"
