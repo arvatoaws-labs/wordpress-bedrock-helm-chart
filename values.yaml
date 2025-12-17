@@ -383,4 +383,4 @@ cron:
 automaticZonePlacement:
   enabled: false
   spreadInstancesTypes: false
-  fqdn: ""
+  fqdn: "wordpress.rds.cloud.internal"
