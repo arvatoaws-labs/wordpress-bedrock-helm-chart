@@ -142,6 +142,16 @@ data:
     limit_req_zone $binary_remote_addr zone=login:{{ .Values.nginx.rate_limit_login.zone_memory_size }} rate={{ .Values.nginx.rate_limit_login.requests_per_second }}r/s;
     {{- end }}
 
+    {{- if .Values.nginx.accessLog.excludeReadinessProbe }}
+    # Exclude readiness probe from access log
+    map "$request_uri $http_user_agent" $loggable {
+        {{- with .Values.nginx.readinessProbe }}
+        ~*^{{ replace "." `\.` .httpGet.path }}.*kube-probe 0;
+        {{- end }}
+        default 1;
+    }
+    {{- end }}
+
     server {
         listen       8080;
         server_name {{ index $.Values.ingress.hosts 0 "host" | quote }};
@@ -255,7 +265,7 @@ data:
         {{- end }}
 
         {{- if .Values.nginx.accessLog.enabled }}
-        access_log /dev/stdout {{ if .Values.nginx.accessLog.logUpstreamTime }}upstream_time{{ else }}main{{- end }};
+        access_log /dev/stdout {{ if .Values.nginx.accessLog.logUpstreamTime }}upstream_time{{ else }}main{{- end }}{{ if .Values.nginx.accessLog.excludeReadinessProbe }} if=$loggable{{- end }};
         {{- else }}
         access_log off;
         {{- end }}
