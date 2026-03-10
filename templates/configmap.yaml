@@ -144,9 +144,13 @@ data:
 
     {{- if .Values.nginx.accessLog.excludeReadinessProbe }}
     # Exclude readiness probe from access log
+    geo $remote_addr $log_client_ip {
+      default 1;
+      10.0.0.0/8 0;
+    }
     map "$request_uri $http_user_agent" $loggable {
         {{- with .Values.nginx.readinessProbe }}
-        ~*^{{ replace "." `\.` .httpGet.path }}.*kube-probe 0;
+        ~*^{{ replace "." `\.` .httpGet.path }}.*kube-probe $log_client_ip;
         {{- end }}
         default 1;
     }
