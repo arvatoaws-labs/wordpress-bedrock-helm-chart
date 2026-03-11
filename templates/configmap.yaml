@@ -147,6 +147,8 @@ data:
     geo $remote_addr $log_client_ip {
       default 1;
       10.0.0.0/8 0;
+      172.16.0.0/12 0;
+      192.168.0.0/16 0;
     }
     map "$request_uri $http_user_agent" $loggable {
         {{- with .Values.nginx.readinessProbe }}
