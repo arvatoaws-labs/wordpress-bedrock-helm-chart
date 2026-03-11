@@ -99,6 +99,7 @@ nginx:
   accessLog:
     enabled: true
     logUpstreamTime: true
+    excludeReadinessProbe: true
   fastcgi_buffer_size: 16k
   fastcgi_buffers_number: 16
   fastcgi_buffers_size: 8k
