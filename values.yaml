@@ -81,7 +81,7 @@ karpenter:
 nginx:
   image:
     repository: public.ecr.aws/nginx/nginx
-    tag: 1.29.4-alpine-slim
+    tag: 1.29.5-alpine-slim
     pullPolicy: IfNotPresent
   resources: {}
   disallow_robots: false
@@ -99,6 +99,7 @@ nginx:
   accessLog:
     enabled: true
     logUpstreamTime: true
+    excludeReadinessProbe: true
   fastcgi_buffer_size: 16k
   fastcgi_buffers_number: 16
   fastcgi_buffers_size: 8k
@@ -180,7 +181,7 @@ offload:
     fileName: wpoffload_private.pem
   errorPages:
     enabled: false
-    image: public.ecr.aws/aws-cli/aws-cli:2.32.18
+    image: public.ecr.aws/aws-cli/aws-cli:2.34.6
     path: /var/www/html/error-pages
 
 
