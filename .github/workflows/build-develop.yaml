@@ -22,29 +22,12 @@ jobs:
       uses: actions/checkout@v6
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v4
-    - name: Configure SSH commit signing
-      shell: bash
-      env:
-        SSH_SIGNING_KEY: ${{ secrets.APP_PRIVATE_KEY }}
-      run: |
-        set -euo pipefail
-
-        # Write private key
-        mkdir -p ~/.ssh
-        printf '%s\n' "$SSH_SIGNING_KEY" > ~/.ssh/signing_key
-        chmod 600 ~/.ssh/signing_key
-
-        # Derive public key from private key
-        ssh-keygen -y -f ~/.ssh/signing_key > ~/.ssh/signing_key.pub
-
-        # Git identity (must match the GitHub account that has the signing key added)
-        git config user.name  "wordpress-bedrock-helm-chart[bot]"
-        git config user.email "235316399+wordpress-bedrock-helm-chart[bot]@users.noreply.github.com"
-
-        # Enable SSH signing for commits
-        git config gpg.format ssh
-        git config user.signingkey ~/.ssh/signing_key.pub
-        git config commit.gpgsign true
+    - name: Generate App Token
+      id: app-token
+      uses: actions/create-github-app-token@v1
+      with:
+        app-id: ${{ secrets.APP_ID }}
+        private-key: ${{ secrets.APP_PRIVATE_KEY }}
     - name: Install helm
       run: |
         wget -q https://get.helm.sh/helm-${HELM_VERSION}-linux-arm64.tar.gz
@@ -67,14 +50,36 @@ jobs:
       run: |
         date > date.txt
     - name: Commit Updated linted files
+      env:
+        GH_TOKEN: ${{ steps.app-token.outputs.token }}
       run: |
-        if [ -n "$(git status --porcelain)" ]; then
-          git add -A
-          git commit -sm "Linted files"
-          git push
-        else
+        # Check for changes
+        if [ -z "$(git status --porcelain)" ]; then
           echo "No changes to commit."
+          exit 0
         fi
+
+        # Stage changes and get the tree
+        git add -A
+        TREE=$(git write-tree)
+        PARENT=$(git rev-parse HEAD)
+
+        # Create commit via GitHub API — automatically verified
+        COMMIT_SHA=$(gh api repos/${{ github.repository }}/git/commits \
+          --method POST \
+          -f "message=Linted files" \
+          -f "tree=${TREE}" \
+          -f "parents[]=${PARENT}" \
+          --jq '.sha')
+
+        # Update the branch ref
+        gh api repos/${{ github.repository }}/git/refs/heads/${{ github.ref_name }} \
+          --method PATCH \
+          -f "sha=${COMMIT_SHA}"
+
+        # Update local ref to match
+        git fetch origin
+        git reset --hard origin/${{ github.ref_name }}
     - name: Package Helm Chart
       run: |
         helm package . --destination ./charts
