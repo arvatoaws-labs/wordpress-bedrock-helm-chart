@@ -3,7 +3,7 @@ name: Build and Publish Helm Chart on Develop Branch
 on:
   push:
     branches:
-      - develop
+    - develop
 
 jobs:
   validate:
@@ -18,8 +18,6 @@ jobs:
     env:
       HELM_VERSION: v4.1.3
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v6
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v4
     - name: Generate App Token
@@ -28,6 +26,10 @@ jobs:
       with:
         app-id: ${{ secrets.APP_ID }}
         private-key: ${{ secrets.APP_PRIVATE_KEY }}
+    - name: Checkout Repository
+      uses: actions/checkout@v6
+      with:
+        token: ${{ steps.app-token.outputs.token }}
     - name: Install helm
       run: |
         wget -q https://get.helm.sh/helm-${HELM_VERSION}-linux-arm64.tar.gz
@@ -46,40 +48,16 @@ jobs:
     - name: Run helm lint
       run: |
         helm lint .
-    - name: Debug sigining
+    - name: Debug signing
       run: |
         date > date.txt
-    - name: Commit Updated linted files
-      env:
-        GH_TOKEN: ${{ steps.app-token.outputs.token }}
-      run: |
-        # Check for changes
-        if [ -z "$(git status --porcelain)" ]; then
-          echo "No changes to commit."
-          exit 0
-        fi
-
-        # Stage changes and get the tree
-        git add -A
-        TREE=$(git write-tree)
-        PARENT=$(git rev-parse HEAD)
-
-        # Create commit via GitHub API — automatically verified
-        COMMIT_SHA=$(gh api repos/${{ github.repository }}/git/commits \
-          --method POST \
-          -f "message=Linted files" \
-          -f "tree=${TREE}" \
-          -f "parents[]=${PARENT}" \
-          --jq '.sha')
-
-        # Update the branch ref
-        gh api repos/${{ github.repository }}/git/refs/heads/${{ github.ref_name }} \
-          --method PATCH \
-          -f "sha=${COMMIT_SHA}"
-
-        # Update local ref to match
-        git fetch origin
-        git reset --hard origin/${{ github.ref_name }}
+    - name: Commit & Push changes
+      uses: iarekylew00t/verified-bot-commit@v2
+      with:
+        if-no-commit: info
+        message: 'chore: Linted files'
+        files: |
+          **
     - name: Package Helm Chart
       run: |
         helm package . --destination ./charts
