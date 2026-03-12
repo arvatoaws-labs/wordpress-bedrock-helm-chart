@@ -26,7 +26,7 @@ jobs:
       id: generate-token
       uses: actions/create-github-app-token@v2
       with:
-        app-id: ${{ vars.APP_ID }}
+        app-id: ${{ secrets.APP_ID }}
         private-key: ${{ secrets.APP_PRIVATE_KEY }}
     - name: Use the token
       env:
@@ -40,11 +40,6 @@ jobs:
         fetch-tags: true
         ref: ${{ github.ref }}
         token: ${{ steps.generate-token.outputs.token }}
-    - name: Set Committer
-      run: |
-        git config --global --add safe.directory $GITHUB_WORKSPACE
-        git config --global user.name 'buildandpublish[bot]'
-        git config --global user.email '${{ vars.APP_ID }}+buildandpublish[bot]@users.noreply.github.com'
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v4
     - name: Install helm
@@ -65,15 +60,13 @@ jobs:
     - name: Run helm lint
       run: |
         helm lint .
-    - name: Commit Updated linted files
-      run: |
-        if [ -n "$(git status --porcelain)" ]; then
-          git add -A
-          git commit -m "Linted files"
-          git push
-        else
-          echo "No changes to commit."
-        fi
+    - name: Commit & Push changes
+      uses: iarekylew00t/verified-bot-commit@v2
+      with:
+        if-no-commit: info
+        message: 'chore: Linted files'
+        files: |
+          **
     - name: Read and Increment Version in Chart.yaml
       id: versioning
       run: |

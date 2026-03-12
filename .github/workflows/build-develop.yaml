@@ -48,9 +48,6 @@ jobs:
     - name: Run helm lint
       run: |
         helm lint .
-    - name: Debug signing
-      run: |
-        date > date.txt
     - name: Commit & Push changes
       uses: iarekylew00t/verified-bot-commit@v2
       with:
