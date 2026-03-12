@@ -9,65 +9,76 @@ jobs:
   validate:
     uses: ./.github/workflows/validate.yaml
     secrets: inherit
-
   build-and-push:
     runs-on: arvato
     permissions:
       id-token: write
       contents: write  # Needed to update the VERSION file
       packages: write
-
     env:
-      HELM_VERSION: v3.19.0
-
+      HELM_VERSION: v4.1.3
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v6
+    - name: Checkout Repository
+      uses: actions/checkout@v6
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v4
+    - name: Configure SSH commit signing
+      shell: bash
+      env:
+        SSH_SIGNING_KEY: ${{ secrets.APP_PRIVATE_KEY }}
+      run: |
+        set -euo pipefail
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
+        # Write private key
+        mkdir -p ~/.ssh
+        printf '%s\n' "$SSH_SIGNING_KEY" > ~/.ssh/signing_key
+        chmod 600 ~/.ssh/signing_key
 
-      - name: Set up Git
-        run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
+        # Derive public key from private key
+        ssh-keygen -y -f ~/.ssh/signing_key > ~/.ssh/signing_key.pub
 
-      - name: Install helm
-        run: |
-          wget -q https://get.helm.sh/helm-${HELM_VERSION}-linux-arm64.tar.gz
-          tar -zxvf helm-${HELM_VERSION}-linux-arm64.tar.gz
-          sudo mv linux-arm64/helm /usr/local/bin/helm
-          rm -rf helm-${HELM_VERSION}-linux-arm64.tar.gz linux-arm64
+        # Git identity (must match the GitHub account that has the signing key added)
+        git config user.name  "wordpress-bedrock-helm-chart[bot]"
+        git config user.email "2039813+wordpress-bedrock-helm-chart[bot]@users.noreply.github.com"
 
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v4
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+        # Enable SSH signing for commits
+        git config gpg.format ssh
+        git config user.signingkey ~/.ssh/signing_key.pub
+        git config commit.gpgsign true
+    - name: Install helm
+      run: |
+        wget -q https://get.helm.sh/helm-${HELM_VERSION}-linux-arm64.tar.gz
+        tar -zxvf helm-${HELM_VERSION}-linux-arm64.tar.gz
+        sudo mv linux-arm64/helm /usr/local/bin/helm
+        rm -rf helm-${HELM_VERSION}-linux-arm64.tar.gz linux-arm64
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v4
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Run helm show chart
+      run: |
+        helm show chart .
+    - name: Run helm lint
+      run: |
+        helm lint .
+    - name: Debug sigining
+      run: |
+        date > date.txt
+    - name: Commit Updated linted files
+      run: |
+        if [ -n "$(git status --porcelain)" ]; then
+          git add -A
+          git commit -sm "Linted files"
+          git push
+        else
+          echo "No changes to commit."
+        fi
+    - name: Package Helm Chart
+      run: |
+        helm package . --destination ./charts
 
-      - name: Run helm show chart
-        run: |
-          helm show chart .
-
-      - name: Run helm lint
-        run: |
-          helm lint .
-
-      - name: Commit Updated linted files
-        run: |
-          if [ -n "$(git status --porcelain)" ]; then
-            git add -A
-            git commit -m "Linted files"
-            git push
-          else
-            echo "No changes to commit."
-          fi
-
-      - name: Package Helm Chart
-        run: |
-          helm package . --destination ./charts
-
-      # - name: Push Docker Image to GHCR
-      #   run: |
-      #     helm push ./charts/*.tgz oci://ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}
+    # - name: Push Docker Image to GHCR
+    #   run: |
+    #     helm push ./charts/*.tgz oci://ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}
