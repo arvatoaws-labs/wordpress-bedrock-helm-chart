@@ -65,6 +65,7 @@ jobs:
       with:
         if-no-commit: info
         message: 'chore: Linted files'
+        token: ${{ steps.generate-token.outputs.token }}
         files: |
           **
     - name: Read and Increment Version in Chart.yaml
@@ -122,6 +123,7 @@ jobs:
       uses: iarekylew00t/verified-bot-commit@v2
       with:
         message: 'update: Increment chart version to ${{ env.new_version }}'
+        token: ${{ steps.generate-token.outputs.token }}
         files: |
           Chart.yaml
     - name: Run helm show chart

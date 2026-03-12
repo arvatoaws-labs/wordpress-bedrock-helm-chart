@@ -53,6 +53,7 @@ jobs:
       with:
         if-no-commit: info
         message: 'chore: Linted files'
+        token: ${{ steps.app-token.outputs.token }}
         files: |
           **
     - name: Package Helm Chart
