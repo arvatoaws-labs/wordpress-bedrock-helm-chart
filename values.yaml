@@ -81,7 +81,7 @@ karpenter:
 nginx:
   image:
     repository: public.ecr.aws/nginx/nginx
-    tag: 1.29.5-alpine-slim
+    tag: 1.29.6-alpine-slim
     pullPolicy: IfNotPresent
   resources: {}
   disallow_robots: false
@@ -181,7 +181,7 @@ offload:
     fileName: wpoffload_private.pem
   errorPages:
     enabled: false
-    image: public.ecr.aws/aws-cli/aws-cli:2.34.6
+    image: public.ecr.aws/aws-cli/aws-cli:2.34.7
     path: /var/www/html/error-pages
 
 
