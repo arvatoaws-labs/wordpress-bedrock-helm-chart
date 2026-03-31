@@ -81,7 +81,7 @@ karpenter:
 nginx:
   image:
     repository: public.ecr.aws/nginx/nginx
-    tag: 1.29.6-alpine-slim
+    tag: 1.29.7-alpine-slim
     pullPolicy: IfNotPresent
   resources: {}
   disallow_robots: false
