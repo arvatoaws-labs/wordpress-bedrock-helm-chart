@@ -3,3 +3,5 @@ appVersion: "1.0"
 description: A Helm chart for Kubernetes
 name: wordpress-bedrock
 version: 0.5.1
+# ImageVolume (with subPath) is GA and enabled by default from 1.36
+kubeVersion: ">= 1.36.0-0"

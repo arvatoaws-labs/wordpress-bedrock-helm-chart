@@ -161,7 +161,6 @@ php:
     readOnlyRootFilesystem: true
     runAsNonRoot: true
     runAsUser: 82
-  readOnlyWebFilesystem: true
   extraVolumeMounts:  []
 
 # additional environment variables passed directly to containers.

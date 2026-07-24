@@ -42,20 +42,8 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       # extend the pods shutdown grace period from the default of 30s to 60s
       terminationGracePeriodSeconds: 60
+      {{- if .Values.offload.privateKey.enabled }}
       initContainers:
-        - name: copy-files
-          securityContext:
-            runAsUser: 0
-          image: "{{ .Values.php.image.repository }}:{{ .Values.php.image.tag }}"
-          imagePullPolicy: {{ .Values.php.image.pullPolicy }}
-          command: ['sh', '-c', 'tar cf - . | (cd /tmp; tar xf -);chown -R www-data:2000 /tmp']
-          volumeMounts:
-          - name: web-volume
-            mountPath: /tmp
-            readOnly: false
-          resources:
-            {{- toYaml .Values.init.resources | nindent 12 }}
-        {{- if .Values.offload.privateKey.enabled }}
         - name: prepare-private-key
           securityContext:
             runAsUser: 0
@@ -83,7 +71,7 @@ spec:
             readOnly: false
           resources:
             {{- toYaml .Values.init.resources | nindent 12 }}
-        {{- end }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}-nginx
           securityContext:
@@ -105,6 +93,7 @@ spec:
             readOnly: true
           - name: web-volume
             mountPath: /var/www/html
+            subPath: var/www/html
             readOnly: true
           - name: uploads-volume
             mountPath: /var/www/html/web/app/uploads
@@ -144,7 +133,8 @@ spec:
             readOnly: true
           - name: web-volume
             mountPath: /var/www/html
-            readOnly: {{ .Values.php.readOnlyWebFilesystem }}
+            subPath: var/www/html
+            readOnly: true
           - name: uploads-volume
             mountPath: /var/www/html/web/app/uploads
             readOnly: false
@@ -284,7 +274,9 @@ spec:
       - name: nginx-var-run-volume
         emptyDir: {}
       - name: web-volume
-        emptyDir: {}
+        image:
+          reference: "{{ .Values.php.image.repository }}:{{ .Values.php.image.tag }}"
+          pullPolicy: {{ .Values.php.image.pullPolicy }}
       - name: uploads-volume
         emptyDir: {}
       {{- if .Values.offload.privateKey.enabled }}
