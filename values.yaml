@@ -81,7 +81,7 @@ karpenter:
 nginx:
   image:
     repository: public.ecr.aws/nginx/nginx
-    tag: 1.31.0-alpine-slim
+    tag: 1.31.3-alpine-slim
     pullPolicy: IfNotPresent
   resources: {}
   disallow_robots: false
@@ -161,7 +161,6 @@ php:
     readOnlyRootFilesystem: true
     runAsNonRoot: true
     runAsUser: 82
-  readOnlyWebFilesystem: true
   extraVolumeMounts:  []
 
 # additional environment variables passed directly to containers.
@@ -181,7 +180,7 @@ offload:
     fileName: wpoffload_private.pem
   errorPages:
     enabled: false
-    image: public.ecr.aws/aws-cli/aws-cli:2.34.48
+    image: public.ecr.aws/aws-cli/aws-cli:2.36.8
     path: /var/www/html/error-pages
 
 

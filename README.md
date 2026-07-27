@@ -2,12 +2,12 @@
 
 This chart is for use with wordpress bedrock. In order to use it you must build a custom php-fpm image with the application code located in /var/www/html.
 
-The init container of this chart prepares a volume for /var/www/html, which is then shared between the nginx and the php-fpm container.
+The PHP image is mounted as a Kubernetes [image volume](https://kubernetes.io/docs/tasks/configure-pod-container/image-volumes/) (subPath `var/www/html`) and shared read-only between the nginx and php-fpm containers. This requires Kubernetes >= 1.36 (ImageVolume GA, enabled by default) and a container runtime that supports image volumes (e.g. containerd or CRI-O).
 
 The setup is tested on AWS EKS and scales well. A typical setup would look like this:
 
 ```
-Cloudfront (blog.example.com) <-> AWS WF       Cloudfront (static.example.com)
+    Cloudfront (blog.example.com) <-> AWS WF       Cloudfront (static.example.com)
        |                                            |
      AWS ALB                                     S3 bucket (filled by wp offload plugin)
        |
@@ -17,9 +17,9 @@ Cloudfront (blog.example.com) <-> AWS WF       Cloudfront (static.example.com)
      |          |
    nginx      php-fpm
          |
-   shared volume (EmptyDir synced from /var/www/html)
-   
-   
+   shared image volume (/var/www/html from php image)
+
+
          |
       AWS RDS / aurora serverless
 
