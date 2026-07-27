@@ -16,33 +16,27 @@ jobs:
   verify-chart:
     runs-on: arvato
 
-    env:
-      HELM_VERSION: v4.2.3
-
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v7
+    - name: Checkout Repository
+      uses: actions/checkout@v7
 
-      - name: Install helm
-        run: |
-          wget https://get.helm.sh/helm-${HELM_VERSION}-linux-arm64.tar.gz
-          tar -zxvf helm-${HELM_VERSION}-linux-arm64.tar.gz
-          sudo mv linux-arm64/helm /usr/local/bin/helm
-          rm -rf helm-${HELM_VERSION}-linux-arm64.tar.gz linux-arm64
+    - name: Set up Helm
+      uses: azure/setup-helm@v5
+      with:
+        version: 'v4.2.3'
 
-      - name: Run helm show chart
-        run: |
-          helm show chart .
+    - name: Run helm show chart
+      run: |
+        helm show chart .
 
-      - name: Run helm lint
-        run: |
-          helm lint .
+    - name: Run helm lint
+      run: |
+        helm lint .
 
-      - name: Run helm template
-        run: |
-          helm template .
+    - name: Run helm template
+      run: |
+        helm template .
 
-      - name: Run helm template with test values
-        run: |
-          helm template . -f ./values_test.yaml
-
+    - name: Run helm template with test values
+      run: |
+        helm template . -f ./values_test.yaml
