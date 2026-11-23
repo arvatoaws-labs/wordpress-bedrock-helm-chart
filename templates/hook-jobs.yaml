@@ -60,8 +60,16 @@ spec:
       - name: {{ $hookname }}
         image: "{{ $.Values.php.image.repository }}:{{ $.Values.php.image.tag }}"
         imagePullPolicy: {{ $.Values.php.image.pullPolicy }}
+        # MYSQL_HOME my.cnf: keep TLS, skip peer verify (Aurora CA/hostname).
         command:
-        - /scripts/{{ $hookname }}.sh
+        - /bin/sh
+        - -c
+        - |
+          mkdir -p /tmp/mysql-home
+          printf '%s\n' '[client]' 'skip-ssl-verify-server-cert' > /tmp/mysql-home/my.cnf
+          export MYSQL_HOME=/tmp/mysql-home
+          export MARIADB_HOME=/tmp/mysql-home
+          exec /scripts/{{ $hookname }}.sh
         env:
         - name: AWS_ZONE
           valueFrom:
